@@ -32,17 +32,41 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BuffManagerLib">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\BuffManagerLib.dll</HintPath>
+    </Reference>
+    <Reference Include="clipper_library">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\clipper_library.dll</HintPath>
+    </Reference>
+    <Reference Include="Evade">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\Evade.dll</HintPath>
+    </Reference>
+    <Reference Include="Igniter">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\Igniter.dll</HintPath>
+    </Reference>
     <Reference Include="LeagueSharp">
-      <HintPath>D:\LSharp\L#\Assemblies\System\LeagueSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LeagueSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="LeagueSharp.AppDomainManager">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LeagueSharp.AppDomainManager.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Common">
-      <HintPath>D:\LSharp\L#\Assemblies\System\LeagueSharp.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="LX-Orbwalker">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LX-Orbwalker.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>D:\LSharp\L#\Assemblies\System\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>D:\LSharp\L#\Assemblies\System\SharpDX.Direct3D9.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\SharpDX.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit.Graphics">
+      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\SharpDX.Toolkit.Graphics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

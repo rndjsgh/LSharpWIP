@@ -1,13 +1,9 @@
-﻿using LeagueSharp;
-using LeagueSharp.Common;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LeagueSharp;
+using LeagueSharp.Common;
 
-namespace ZedSharp
-{
+namespace ZedSharp {
     //TODO idea, use EvadeSpellDatabase or .dll to have an option to use ultimate to dodge dangeruous spells like Grag ult when evade can't dodge, so it doesn't waste ur R ? 
     //TODO - reply here.
     //TODO - when hes played more we will finish this tbh, i doubt he can carry solo q anyway too team orientated..
@@ -24,42 +20,34 @@ namespace ZedSharp
      * At comboing put shadow w at best position to escape over wall or stuff
      */
 
-    class ZedSharp
-    {
-        
+    internal class ZedSharp {
         public const string CharName = "Zed";
 
-        public static Menu menu;
+        private static Menu menu;
 
-      //  public static HpBarIndicator hpi = new HpBarIndicator();
-        
+        //  public static HpBarIndicator hpi = new HpBarIndicator();
 
-        public ZedSharp()
-        {
+
+        public ZedSharp() {
             Console.WriteLine("Zed sharp starting...");
-            try
-            {
+            try {
                 // if (ObjectManager.Player.BaseSkinName != CharName)
                 //    return;
                 /* CallBAcks */
                 CustomEvents.Game.OnGameLoad += onLoad;
             }
-            catch (Exception ex)
-            {
-               Console.WriteLine(ex.Message);
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
             }
         }
 
-        private static void HeroMenuCreate()
-        {
-            foreach (var Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
-            {
+        private static void HeroMenuCreate() {
+            foreach (Obj_AI_Hero Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy)) {
                 menu.SubMenu("ultOn").AddItem(new MenuItem("use" + Enemy.ChampionName, Enemy.ChampionName).SetValue(true));
             }
         }
 
-        private static void loadMenu()
-        {
+        private static void loadMenu() {
             menu.AddSubMenu(new Menu("Combo Options", "combo"));
             menu.SubMenu("combo").AddItem(new MenuItem("useQC", "Use Q in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useWC", "Use W in combo").SetValue(true));
@@ -76,17 +64,16 @@ namespace ZedSharp
             HeroMenuCreate();
 
             menu.AddSubMenu(new Menu("Misc Options", "misc"));
-            menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true));//dont need %
-            menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1)));//nop
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true)); //dont need %
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
             menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
+
             Game.PrintChat("Zed by iJava,DZ191 and DETUKS Loaded.");
         }
 
-        private static void onLoad(EventArgs args)
-        {
-            try
-            {
+        private static void onLoad(EventArgs args) {
+            try {
                 loadMenu();
                 menu.AddToMainMenu();
 
@@ -101,45 +88,24 @@ namespace ZedSharp
                 Game.OnGameProcessPacket += OnGameProcessPacket;
 
                 Zed.setSkillshots();
-
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        private static void OnGameProcessPacket(GamePacketEventArgs args)
-        {
-        }
+        private static void OnGameProcessPacket(GamePacketEventArgs args) {}
 
-        private static void OnGameSendPacket(GamePacketEventArgs args)
-        {
-        }
+        private static void OnGameSendPacket(GamePacketEventArgs args) {}
 
-        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-        }
+        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args) {}
 
-        private static void OnDeleteObject(GameObject sender, EventArgs args)
-        {
-        }
+        private static void OnDeleteObject(GameObject sender, EventArgs args) {}
 
-        private static void OnCreateObject(GameObject sender, EventArgs args)
-        {
-        }
+        private static void OnCreateObject(GameObject sender, EventArgs args) {}
 
-        private static void OnGameUpdate(EventArgs args)
-        {
-        }
+        private static void OnGameUpdate(EventArgs args) {}
 
-        private static void onDraw(EventArgs args)
-        {
-
-        }
-
-       
-
-
+        private static void onDraw(EventArgs args) {}
     }
 }
