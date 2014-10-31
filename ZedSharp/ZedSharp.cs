@@ -1,0 +1,145 @@
+﻿using LeagueSharp;
+using LeagueSharp.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ZedSharp
+{
+    //TODO idea, use EvadeSpellDatabase or .dll to have an option to use ultimate to dodge dangeruous spells like Grag ult when evade can't dodge, so it doesn't waste ur R ? 
+    //TODO - reply here.
+    //TODO - when hes played more we will finish this tbh, i doubt he can carry solo q anyway too team orientated..
+
+    /* 
+     * In combo it should Cast R then Items (Bork/Hydra/etc) after that everything is variable. 
+     * If the enemy dashes/blinks away use W-E-Double Q. If not Zed should try to save his W shadow 
+     * in case the enemy is saving his Escape for your double Q. If the enemy doesnt try to get away 
+     * at all Zed should just either save his W or throw it in last second to get the double Q for his Death Mark Proc.
+     * Also dodging important spells with Death Mark and Shadow Swaps should be an option confirguable spell by spell 
+     * and integrated into Evade. With Shadow Swaps it should check if a specific number of enemys is around before switching 
+     * and also check how far away/how close the shadow is from your target (assuming you are holding combo key down) and a check 
+     * if the spell would kill you if you dont dodge it etc etc I could continue talking about such features for, well, forever.
+     * At comboing put shadow w at best position to escape over wall or stuff
+     */
+
+    class ZedSharp
+    {
+        
+        public const string CharName = "Zed";
+
+        public static Menu menu;
+
+      //  public static HpBarIndicator hpi = new HpBarIndicator();
+        
+
+        public ZedSharp()
+        {
+            Console.WriteLine("Zed sharp starting...");
+            try
+            {
+                // if (ObjectManager.Player.BaseSkinName != CharName)
+                //    return;
+                /* CallBAcks */
+                CustomEvents.Game.OnGameLoad += onLoad;
+            }
+            catch (Exception ex)
+            {
+               Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void HeroMenuCreate()
+        {
+            foreach (var Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            {
+                menu.SubMenu("ultOn").AddItem(new MenuItem("use" + Enemy.ChampionName, Enemy.ChampionName).SetValue(true));
+            }
+        }
+
+        private static void loadMenu()
+        {
+            menu.AddSubMenu(new Menu("Combo Options", "combo"));
+            menu.SubMenu("combo").AddItem(new MenuItem("useQC", "Use Q in combo").SetValue(true));
+            menu.SubMenu("combo").AddItem(new MenuItem("useWC", "Use W in combo").SetValue(true));
+            menu.SubMenu("combo").AddItem(new MenuItem("useEC", "Use E in combo").SetValue(true));
+            menu.SubMenu("combo").AddItem(new MenuItem("useRC", "Use R in combo").SetValue(true));
+            menu.SubMenu("combo").AddItem(new MenuItem("useWF", "Use W to follow").SetValue(true));
+
+            menu.AddSubMenu(new Menu("Harass Options", "harass"));
+            menu.SubMenu("harass").AddItem(new MenuItem("useQH", "Use Q in harass").SetValue(true));
+            menu.SubMenu("harass").AddItem(new MenuItem("useWH", "Use W in harass").SetValue(false));
+            menu.SubMenu("harass").AddItem(new MenuItem("useEH", "Use E in harass").SetValue(false));
+
+            menu.AddSubMenu(new Menu("Use ultimate on", "ultOn"));
+            HeroMenuCreate();
+
+            menu.AddSubMenu(new Menu("Misc Options", "misc"));
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true));//dont need %
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1)));//nop
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
+            menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
+            Game.PrintChat("Zed by iJava,DZ191 and DETUKS Loaded.");
+        }
+
+        private static void onLoad(EventArgs args)
+        {
+            try
+            {
+                loadMenu();
+                menu.AddToMainMenu();
+
+                Drawing.OnDraw += onDraw;
+                Game.OnGameUpdate += OnGameUpdate;
+
+                GameObject.OnCreate += OnCreateObject;
+                GameObject.OnDelete += OnDeleteObject;
+                Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
+
+                Game.OnGameSendPacket += OnGameSendPacket;
+                Game.OnGameProcessPacket += OnGameProcessPacket;
+
+                Zed.setSkillshots();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void OnGameProcessPacket(GamePacketEventArgs args)
+        {
+        }
+
+        private static void OnGameSendPacket(GamePacketEventArgs args)
+        {
+        }
+
+        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+        }
+
+        private static void OnDeleteObject(GameObject sender, EventArgs args)
+        {
+        }
+
+        private static void OnCreateObject(GameObject sender, EventArgs args)
+        {
+        }
+
+        private static void OnGameUpdate(EventArgs args)
+        {
+        }
+
+        private static void onDraw(EventArgs args)
+        {
+
+        }
+
+       
+
+
+    }
+}
