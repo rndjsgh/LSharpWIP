@@ -2,6 +2,7 @@
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
 
 namespace ZedSharp {
     //TODO idea, use EvadeSpellDatabase or .dll to have an option to use ultimate to dodge dangeruous spells like Grag ult when evade can't dodge, so it doesn't waste ur R ? 
@@ -48,6 +49,16 @@ namespace ZedSharp {
         }
 
         private static void loadMenu() {
+            menu = new Menu("Zed Sharp", "zedSharp", true);
+
+            var targetSelector = new Menu("Target Selector", "Target Selector"); //TODO new target selector ofc.
+            SimpleTs.AddToMenu(targetSelector);
+            menu.AddSubMenu(targetSelector);
+
+            var orbwalkerMenu = new Menu("LX Orbwalker", "my_Orbwalker");
+            LXOrbwalker.AddToMenu(orbwalkerMenu);
+            menu.AddSubMenu(orbwalkerMenu);
+
             menu.AddSubMenu(new Menu("Combo Options", "combo"));
             menu.SubMenu("combo").AddItem(new MenuItem("useQC", "Use Q in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useWC", "Use W in combo").SetValue(true));
@@ -68,6 +79,8 @@ namespace ZedSharp {
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
             menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
+
+            menu.AddToMainMenu();
 
             Game.PrintChat("Zed by iJava,DZ191 and DETUKS Loaded.");
         }
@@ -102,9 +115,34 @@ namespace ZedSharp {
 
         private static void OnDeleteObject(GameObject sender, EventArgs args) {}
 
-        private static void OnCreateObject(GameObject sender, EventArgs args) {}
+        private static void OnCreateObject(GameObject sender, EventArgs args) {
+            var spell = (Obj_SpellMissile)sender;
+            Obj_AI_Base unit = spell.SpellCaster;
+            string name = spell.SData.Name;
+            if (!unit.IsMe) return;
+            switch (name) {
+                case "ZedShadowDashMissile":
+                    //todo
+                    break;
+                case "ZedUltMissile":
+                    //todo
+                    break;
+            }
 
-        private static void OnGameUpdate(EventArgs args) {}
+            //"Zed_Base_R_buf_tell.troy" = killable
+        }
+
+        private static void OnGameUpdate(EventArgs args) {
+            switch (LXOrbwalker.CurrentMode) {
+                case LXOrbwalker.Mode.Combo:
+                    Zed.doCombo();
+                    break;
+
+                case LXOrbwalker.Mode.Harass:
+                    Zed.doHarass();
+                    break;
+            }
+        }
 
         private static void onDraw(EventArgs args) {}
     }
