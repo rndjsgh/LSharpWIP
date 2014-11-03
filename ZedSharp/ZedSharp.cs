@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SharpDX;
-using Color = System.Drawing.Color;
 
 namespace ZedSharp {
     //TODO idea, use EvadeSpellDatabase or .dll to have an option to use ultimate to dodge dangeruous spells like Grag ult when evade can't dodge, so it doesn't waste ur R ? 
@@ -25,10 +24,9 @@ namespace ZedSharp {
     internal class ZedSharp {
         public const string CharName = "Zed";
 
-        private static Menu menu;
+        public static Menu menu;
 
         public static HpBarIndicator hpi = new HpBarIndicator();
-        //  public static HpBarIndicator hpi = new HpBarIndicator();
 
 
         public ZedSharp() {
@@ -85,8 +83,6 @@ namespace ZedSharp {
             menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
 
-            //menu.AddToMainMenu();
-
             Game.PrintChat("Zed by iJava,DZ191 and DETUKS Loaded.");
         }
 
@@ -119,22 +115,17 @@ namespace ZedSharp {
 
         private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args) {}
 
-        private static void OnDeleteObject(GameObject sender, EventArgs args)
-        {
+        private static void OnDeleteObject(GameObject sender, EventArgs args) {
             if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId)
                 Zed.shadowR = null;
             if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId)
                 Zed.shadowW = null;
         }
 
-        private static void OnCreateObject(GameObject sender, EventArgs args) 
-        {
-
-            if (sender is Obj_AI_Minion )
-            {
+        private static void OnCreateObject(GameObject sender, EventArgs args) {
+            if (sender is Obj_AI_Minion) {
                 var min = sender as Obj_AI_Minion;
-                if (min.IsAlly && min.BaseSkinName == "ZedShadow")
-                {
+                if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
                     if (Zed.getRshad)
                         Zed.shadowR = min;
                     else
@@ -142,7 +133,7 @@ namespace ZedSharp {
                 }
             }
 
-            var spell = (Obj_SpellMissile)sender;
+            var spell = (Obj_SpellMissile) sender;
 
             Obj_AI_Base unit = spell.SpellCaster;
             string name = spell.SData.Name;
@@ -168,26 +159,21 @@ namespace ZedSharp {
             }
         }
 
-        private static void OnEndScene(EventArgs args)
-        {
-            if (menu.Item("drawHp").GetValue<bool>())
-            {
+        private static void OnEndScene(EventArgs args) {
+            if (menu.Item("drawHp").GetValue<bool>()) {
                 foreach (
-                    var enemy in
+                    Obj_AI_Hero enemy in
                         ObjectManager.Get<Obj_AI_Hero>()
-                            .Where(ene => !ene.IsDead && ene.IsEnemy && ene.IsVisible))
-                {
+                            .Where(ene => !ene.IsDead && ene.IsEnemy && ene.IsVisible)) {
                     hpi.unit = enemy;
                     hpi.drawDmg(Zed.getFullComboDmg(enemy));
-
                 }
             }
         }
 
-        private static void onDraw(EventArgs args)
-        {
-            if(Zed.shadowW != null && !Zed.shadowW.IsDead)
-                Drawing.DrawCircle(Zed.shadowW.Position,100, Color.Red);
+        private static void onDraw(EventArgs args) {
+            if (Zed.shadowW != null && !Zed.shadowW.IsDead)
+                Drawing.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
         }
     }
 }

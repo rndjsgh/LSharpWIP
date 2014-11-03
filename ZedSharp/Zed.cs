@@ -34,19 +34,18 @@ namespace ZedSharp {
             PredictionOutput po = Prediction.GetPrediction(target, 0.5f);
             float dist = Player.Distance(po.UnitPosition);
             float gapDist = ((W.IsReady()) ? W.Range : 0);
-            float distAfterGap = dist- gapDist;
+            float distAfterGap = dist - gapDist;
             if (distAfterGap < Player.AttackRange)
-                dmg += (float)Player.GetAutoAttackDamage(target);
+                dmg += (float) Player.GetAutoAttackDamage(target);
             if (Q.IsReady() && distAfterGap < Q.Range)
                 dmg += Q.GetDamage(target);
-            if (Q.IsReady() && W.IsReady() && distAfterGap < Q.Range && dist<Q.Range)
+            if (Q.IsReady() && W.IsReady() && distAfterGap < Q.Range && dist < Q.Range)
                 dmg += Q.GetDamage(target)/2;
             if (distAfterGap < E.Range)
                 dmg += E.GetDamage(target);
-            if (R.IsReady() && distAfterGap < R.Range)
-            {
+            if (R.IsReady() && distAfterGap < R.Range) {
                 dmg += R.GetDamage(target);
-                dmg +=(float) Player.CalcDamage(target, Damage.DamageType.Physical, (dmg*(5 + 15*R.Level)/100));
+                dmg += (float) Player.CalcDamage(target, Damage.DamageType.Physical, (dmg*(5 + 15*R.Level)/100));
             }
 
 
@@ -76,18 +75,18 @@ namespace ZedSharp {
         public static void doCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
-            if (R.IsReady())
+            if (R.IsReady() && ZedSharp.menu.Item("useRC").GetValue<bool>())
                 R.Cast(target);
 
-            if (W.IsReady() && target.Distance(ObjectManager.Player) < W.Range) {
+            if (W.IsReady()) {
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
-                W.Cast(positionBehind);
+                W.Cast(target, true);
             }
 
             if (Q.IsReady()) {
                 if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
-                    Q.Cast(target, false, true); // do packets shit
+                    Q.Cast(target, true, true); // do packets shit
             }
 
             if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range) {
@@ -105,10 +104,10 @@ namespace ZedSharp {
         public static void doHarass() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
-            if (W.IsReady() && target.Distance(ObjectManager.Player) < W.Range) {
+            if (W.IsReady()) {
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
-                W.Cast(positionBehind, true);
+                W.Cast(target, true);
             }
 
             if (Q.IsReady() && target.Distance(ObjectManager.Player) < Q.Range) {
