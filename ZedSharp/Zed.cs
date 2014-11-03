@@ -18,16 +18,37 @@ namespace ZedSharp {
         public static Spell E = new Spell(SpellSlot.E, 290);
         public static Spell R = new Spell(SpellSlot.R, 600);
 
+        public static Obj_AI_Minion shadowW;
+        public static bool getRshad = false;
+        public static Obj_AI_Minion shadowR;
+
+
         public static void setSkillshots() {
             Q.SetSkillshot(Qdata.SData.SpellCastTime, Qdata.SData.LineWidth, Qdata.SData.MissileSpeed, false,
                 SkillshotType.SkillshotLine);
             //Thats all we need to set
         }
 
-        public static float getComboDmg(Obj_AI_Hero target) {
+        public static float getFullComboDmg(Obj_AI_Hero target) {
             float dmg = 0;
-            float dist = Player.Distance(target);
-            float gapDist = ((W.IsReady()) ? W.Range : 0) + ((R.IsReady()) ? R.Range : 0);
+            PredictionOutput po = Prediction.GetPrediction(target, 0.5f);
+            float dist = Player.Distance(po.UnitPosition);
+            float gapDist = ((W.IsReady()) ? W.Range : 0);
+            float distAfterGap = dist- gapDist;
+            if (distAfterGap < Player.AttackRange)
+                dmg += (float)Player.GetAutoAttackDamage(target);
+            if (Q.IsReady() && distAfterGap < Q.Range)
+                dmg += Q.GetDamage(target);
+            if (Q.IsReady() && W.IsReady() && distAfterGap < Q.Range && dist<Q.Range)
+                dmg += Q.GetDamage(target)/2;
+            if (distAfterGap < E.Range)
+                dmg += E.GetDamage(target);
+            if (R.IsReady() && distAfterGap < R.Range)
+            {
+                dmg += R.GetDamage(target);
+                dmg +=(float) Player.CalcDamage(target, Damage.DamageType.Physical, (dmg*(5 + 15*R.Level)/100));
+            }
+
 
             return dmg;
         }
@@ -56,21 +77,21 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
             if (R.IsReady())
-                R.Cast(target, true);
+                R.Cast(target);
 
             if (W.IsReady() && target.Distance(ObjectManager.Player) < W.Range) {
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
-                W.Cast(positionBehind, true);
+                W.Cast(positionBehind);
             }
 
-            if (Q.IsReady() && target.Distance(ObjectManager.Player) < Q.Range) {
+            if (Q.IsReady()) {
                 if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
-                    Q.Cast(target, true, true); // do packets shit
+                    Q.Cast(target, false, true); // do packets shit
             }
 
             if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range) {
-                E.CastOnUnit(ObjectManager.Player, true);
+                E.CastOnUnit(ObjectManager.Player);
             }
 
             foreach (
