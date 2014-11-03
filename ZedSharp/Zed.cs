@@ -81,7 +81,7 @@ namespace ZedSharp {
             if (W.IsReady()) {
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
-                W.Cast(target, true);
+                W.Cast(target.Position, true);
             }
 
             if (Q.IsReady()) {
@@ -107,7 +107,7 @@ namespace ZedSharp {
             if (W.IsReady()) {
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
-                W.Cast(target, true);
+                W.Cast(target.Position, true);
             }
 
             if (Q.IsReady() && target.Distance(ObjectManager.Player) < Q.Range) {
