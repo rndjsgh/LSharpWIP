@@ -137,7 +137,6 @@ namespace ZedSharp {
                 case LXOrbwalker.Mode.Combo:
                     Zed.doCombo();
                     break;
-
                 case LXOrbwalker.Mode.Harass:
                     Zed.doHarass();
                     break;
