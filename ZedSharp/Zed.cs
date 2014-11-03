@@ -89,7 +89,7 @@ namespace ZedSharp {
                     Q.Cast(target, true, true); // do packets shit
             }
 
-            if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range) {
+            if (E.IsReady()) {
                 E.CastOnUnit(ObjectManager.Player);
             }
 
