@@ -21,7 +21,8 @@ namespace ZedSharp {
         public static Obj_AI_Minion shadowW;
         public static bool getRshad = false;
         public static Obj_AI_Minion shadowR;
-
+        
+        public static HitChance CustomHitChance = HitChance.High;
 
         public static void setSkillshots() {
             Q.SetSkillshot(Qdata.SData.SpellCastTime, Qdata.SData.LineWidth, Qdata.SData.MissileSpeed, false,
@@ -102,19 +103,38 @@ namespace ZedSharp {
         }
 
         public static void doHarass() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-
+            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);   
+         
             if (W.IsReady()) {
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
                 W.Cast(target.Position, true);
             }
-
-            if (Q.IsReady() && target.Distance(ObjectManager.Player) < Q.Range) {
-                Q.Cast(target, true, true);
+            var QPrediction = Q.GetPrediction(target);
+            var CustomQPredictionW = Prediction.GetPrediction(new PredictionInput
+            {
+                Unit = target,
+                Delay = Q.Delay,
+                Radius = Q.Width,
+                From = shadowW.Position, //We check for prediction in advance
+                Range = Q.Range,
+                Collision = false,
+                Type = Q.Type,
+                RangeCheckFrom = ObjectManager.Player.ServerPosition,
+                Aoe = false
+            });
+            
+            if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range && QPrediction.Hitchance >= CustomHitChance)
+            {
+                Q.Cast(QPrediction.CastPosition, true);
             }
-
-            if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range) {
+            if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
+               CustomQPredictionW.Hitchance >= CustomHitChance)
+            {
+                Q.Cast(CustomQPredictionW.CastPosition, true);
+            }
+            if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range || target.Distance(shadowW.Position) <= E.Range)
+            {
                 E.CastOnUnit(ObjectManager.Player, true);
             }
         }
