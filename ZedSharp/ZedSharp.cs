@@ -131,6 +131,10 @@ namespace ZedSharp {
                     else
                         Zed.shadowW = min;
                 }
+
+                if (sender.Name == "Zed_Base_R_buf_tell.troy" && sender.IsEnemy) {
+                    //TODO check if this works it means the enemy is killable with ult and you can then leave him and return to ult shadow if it is still active.
+                }
             }
 
             var spell = (Obj_SpellMissile) sender;
