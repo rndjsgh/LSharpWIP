@@ -48,28 +48,19 @@ namespace ZedSharp {
                 dmg += R.GetDamage(target);
                 dmg += (float) Player.CalcDamage(target, Damage.DamageType.Physical, (dmg*(5 + 15*R.Level)/100));
             }
-
-
             return dmg;
         }
 
-        public static bool canGoToShadow() {
+        public static bool canGoToShadow(string type) {
             // TODO Shadow param W or R
-            if (Wdata.Name == "zedw2")
-                return true;
-            if (Rdata.Name == "ZedR2")
-                return true;
-            /**
-             * switch (RW) {
-                case RWEnum.W:
-                    if (player.Spellbook.GetSpell(SpellSlot.W).Name == "zedw2") TODO like so
-                        return true;
-                    break;
-                case RWEnum.R:
-                    if (player.Spellbook.GetSpell(SpellSlot.R).Name == "ZedR2")
-                        return true;
-                    break;
-            }*/
+            if (type == "W") {
+                if (Wdata.Name == "zedw2")
+                    return true;
+            }
+            if (type == "R") {
+                if (Rdata.Name == "ZedR2")
+                    return true;
+            }
             return false;
         }
 
@@ -85,42 +76,54 @@ namespace ZedSharp {
                 W.Cast(target.Position, true);
             }
 
-            PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
-                Unit = target,
-                Delay = Q.Delay,
-                Radius = Q.Width,
-                From = shadowW.Position, //We check for prediction in advance
-                Range = Q.Range,
-                Collision = false,
-                Type = Q.Type,
-                RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                Aoe = true
-            });
-
-            PredictionOutput CustomQPredictionR = Prediction.GetPrediction(new PredictionInput {
-                Unit = target,
-                Delay = Q.Delay,
-                Radius = Q.Width,
-                From = shadowR.Position, //We check for prediction in advance
-                Range = Q.Range,
-                Collision = false,
-                Type = Q.Type,
-                RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                Aoe = true
-            });
-
-            if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range &&
-                    Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
-                    Q.Cast(Q.GetPrediction(target, true).CastPosition, true);
+            if (Player.Distance(target) > LXOrbwalker.GetAutoAttackRange() &&
+                shadowW.Distance(target) < LXOrbwalker.GetAutoAttackRange()) {
+                //TODO second cast W ?
+                if (canGoToShadow("W") && ZedSharp.menu.Item("useWF").GetValue<bool>()) {
+                    W.Cast(Player, true); // Check if this works
                 }
-                if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
-                    CustomQPredictionW.Hitchance >= CustomHitChance) {
-                    Q.Cast(CustomQPredictionW.CastPosition, true);
-                }
-                if (Q.IsReady() && target.Distance(shadowR.Position) <= Q.Range &&
-                    CustomQPredictionR.Hitchance >= CustomHitChance) {
-                    Q.Cast(CustomQPredictionR.CastPosition, true);
+            }
+
+            if (shadowW != null) {
+                PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
+                    Unit = target,
+                    Delay = Q.Delay,
+                    Radius = Q.Width,
+                    From = shadowW.Position, //We check for prediction in advance
+                    Range = Q.Range,
+                    Collision = false,
+                    Type = Q.Type,
+                    RangeCheckFrom = ObjectManager.Player.ServerPosition,
+                    Aoe = true
+                });
+
+                if (shadowR != null) {
+                    PredictionOutput CustomQPredictionR = Prediction.GetPrediction(new PredictionInput {
+                        Unit = target,
+                        Delay = Q.Delay,
+                        Radius = Q.Width,
+                        From = shadowR.Position, //We check for prediction in advance
+                        Range = Q.Range,
+                        Collision = false,
+                        Type = Q.Type,
+                        RangeCheckFrom = ObjectManager.Player.ServerPosition,
+                        Aoe = true
+                    });
+
+                    if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
+                        if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range &&
+                            Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
+                            Q.Cast(Q.GetPrediction(target, true).CastPosition, true);
+                        }
+                        if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
+                            CustomQPredictionW.Hitchance >= CustomHitChance) {
+                            Q.Cast(CustomQPredictionW.CastPosition, true);
+                        }
+                        if (Q.IsReady() && target.Distance(shadowR.Position) <= Q.Range &&
+                            CustomQPredictionR.Hitchance >= CustomHitChance) {
+                            Q.Cast(CustomQPredictionR.CastPosition, true);
+                        }
+                    }
                 }
             }
 
