@@ -78,9 +78,9 @@ namespace ZedSharp {
             if (R.IsReady() && ZedSharp.menu.Item("useRC").GetValue<bool>())
                 R.Cast(target);
 
-            if (W.IsReady()) {
-                Vector3 positionBehind = target.Position +
-                                         Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
+            if (W.IsReady() && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
+               // Vector3 positionBehind = target.Position +
+                 //                        Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
                 W.Cast(target.Position, true);
             }
 
@@ -89,7 +89,7 @@ namespace ZedSharp {
                     Q.Cast(target, true, true); // do packets shit
             }
 
-            if (E.IsReady()) {
+            if (E.IsReady()) { // TODO check shadow position with enemy position so we can cast e effectivly.
                 E.CastOnUnit(ObjectManager.Player);
             }
 
