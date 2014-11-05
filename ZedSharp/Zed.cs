@@ -85,7 +85,6 @@ namespace ZedSharp {
                 W.Cast(target.Position, true);
             }
 
-            PredictionOutput QPrediction = Q.GetPrediction(target);
             PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
                 Unit = target,
                 Delay = Q.Delay,
@@ -95,17 +94,33 @@ namespace ZedSharp {
                 Collision = false,
                 Type = Q.Type,
                 RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                Aoe = false
+                Aoe = true
+            });
+
+            PredictionOutput CustomQPredictionR = Prediction.GetPrediction(new PredictionInput {
+                Unit = target,
+                Delay = Q.Delay,
+                Radius = Q.Width,
+                From = shadowR.Position, //We check for prediction in advance
+                Range = Q.Range,
+                Collision = false,
+                Type = Q.Type,
+                RangeCheckFrom = ObjectManager.Player.ServerPosition,
+                Aoe = true
             });
 
             if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
                 if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range &&
-                    QPrediction.Hitchance >= CustomHitChance) {
-                    Q.Cast(QPrediction.CastPosition, true);
+                    Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
+                    Q.Cast(Q.GetPrediction(target, true).CastPosition, true);
                 }
                 if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
                     CustomQPredictionW.Hitchance >= CustomHitChance) {
                     Q.Cast(CustomQPredictionW.CastPosition, true);
+                }
+                if (Q.IsReady() && target.Distance(shadowR.Position) <= Q.Range &&
+                    CustomQPredictionR.Hitchance >= CustomHitChance) {
+                    Q.Cast(CustomQPredictionR.CastPosition, true);
                 }
             }
 
