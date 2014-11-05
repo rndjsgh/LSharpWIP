@@ -76,21 +76,37 @@ namespace ZedSharp {
         public static void doCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
-            if (R.IsReady() && ZedSharp.menu.Item("useRC").GetValue<bool>())
+            if (R.IsReady() && shadowR == null && ZedSharp.menu.Item("useRC").GetValue<bool>())
                 R.Cast(target);
 
-            if (W.IsReady() && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
+            if (W.IsReady() && shadowW == null && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                // Vector3 positionBehind = target.Position +
                  //                        Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
                 W.Cast(target.Position, true);
             }
 
-            if (Q.IsReady()) {
-                if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
-                    Q.Cast(target, true, true); // do packets shit
+            var QPrediction = Q.GetPrediction(target);
+            var CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
+                Unit = target,
+                Delay = Q.Delay,
+                Radius = Q.Width,
+                From = shadowW.Position, //We check for prediction in advance
+                Range = Q.Range,
+                Collision = false,
+                Type = Q.Type,
+                RangeCheckFrom = ObjectManager.Player.ServerPosition,
+                Aoe = false
+            });
+
+            if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range && QPrediction.Hitchance >= CustomHitChance) {
+                Q.Cast(QPrediction.CastPosition, true);
+            }
+            if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
+               CustomQPredictionW.Hitchance >= CustomHitChance) {
+                Q.Cast(CustomQPredictionW.CastPosition, true);
             }
 
-            if (E.IsReady()) { // TODO check shadow position with enemy position so we can cast e effectivly.
+            if (E.IsReady() && target.Distance(shadowW) <= E.Range || target.Distance(Player) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) { // TODO check shadow position with enemy position so we can cast e effectivly.
                 E.CastOnUnit(ObjectManager.Player);
             }
 
