@@ -135,6 +135,7 @@ namespace ZedSharp {
                 if (sender.Name == "Zed_Base_R_buf_tell.troy" && sender.IsEnemy) {
                     //TODO check if this works it means the enemy is killable with ult and you can then leave him and return to ult shadow if it is still active.
                     //TODO targetKillable = true - alos check hp and if below % go back to RShadow?
+                    Zed.checkForSwap("OnKill");
                 }
             }
 
@@ -153,7 +154,9 @@ namespace ZedSharp {
             //"Zed_Base_R_buf_tell.troy" = killable
         }
 
-        private static void OnGameUpdate(EventArgs args) {
+        private static void OnGameUpdate(EventArgs args)
+        {
+            Zed.checkForSwap("LowHP");
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     Zed.doCombo();
@@ -164,6 +167,7 @@ namespace ZedSharp {
             }
         }
 
+        
         private static void OnEndScene(EventArgs args) {
             if (menu.Item("drawHp").GetValue<bool>()) {
                 foreach (
@@ -180,5 +184,6 @@ namespace ZedSharp {
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Drawing.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
         }
+        
     }
 }

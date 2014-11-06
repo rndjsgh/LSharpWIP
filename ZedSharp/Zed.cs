@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Data;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -174,6 +176,36 @@ namespace ZedSharp {
                 target.Distance(shadowW.Position) <= E.Range) {
                 E.CastOnUnit(ObjectManager.Player, true);
             }
+        }
+
+        public static void checkForSwap(String mode)
+        {
+            switch (mode)
+            {
+                case "LowHP":
+                    var HPPerc = ZedSharp.menu.Item("SwapHP").GetValue<Slider>().Value;
+                    var myHP = (ObjectManager.Player.Health / ObjectManager.Player.MaxHealth) * 100;
+                    if (myHP <= HPPerc && ZedSharp.menu.Item("SwapHPToggle").GetValue<bool>())
+                    {
+                        if (canGoToShadow("R") && isSafeSwap(shadowR)) R.Cast();
+                    }
+                    break;
+                case "OnKill":
+                    if (canGoToShadow("R") && isSafeSwap(shadowR)) R.Cast();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public static bool isSafeSwap(Obj_AI_Minion shadow)
+        {
+            if (!ZedSharp.menu.Item("SafeRBack").GetValue<bool>()) return true;
+            //Idk if 500 is ok, maybe we can increment it a little bit more
+            var enemiesShadow = shadow.Position.CountEnemysInRange(500);
+            var enemiesPlayer = ObjectManager.Player.Position.CountEnemysInRange(500);
+            if (enemiesShadow < enemiesPlayer) return true;
+            return false;
         }
     }
 }
