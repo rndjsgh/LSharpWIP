@@ -178,7 +178,7 @@ namespace ZedSharp {
             }
         }
 
-        public static void checkForSwap(String mode)
+        public static void checkForSwap(string mode)
         {
             switch (mode)
             {
