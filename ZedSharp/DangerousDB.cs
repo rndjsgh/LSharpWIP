@@ -43,7 +43,7 @@ namespace ZedSharp {
                     where
                         dangerousSpell.ChampName == enemy.ChampionName &&
                         isSpellReady(enemy.ChampionName, dangerousSpell.spell) &&
-                        enemy.Distance(target) <= enemy.Spellbook.GetSpell(dangerousSpell.spell).SData.CastRange[0] &&
+                        enemy.Distance(target) <= enemy.Spellbook.GetSpell(dangerousSpell.spell).SData.CastRange[0] && //Not sure CastRange[0] Works
                         (dangerousSpell.buff!=null?enemy.HasBuff(dangerousSpell.buff,true):true)
                     select
                         new DangerousHero
