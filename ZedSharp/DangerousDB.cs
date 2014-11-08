@@ -65,6 +65,19 @@ namespace ZedSharp {
             return dangerLevel >= 15;
         }
 
+        /// <summary>
+        /// Returns true if the hero has the item.
+        /// </summary>
+        public static bool hasItem(string name, Obj_AI_Hero hero) {
+            return hero.InventoryItems.Any(slot => slot.Name == name);
+        }
+        /// <summary>
+        /// Returns true if the hero has the item.
+        /// </summary>
+        public static bool hasItem(int id, Obj_AI_Hero hero) {
+            return hero.InventoryItems.Any(slot => slot.Id == (ItemId)id);
+        }
+
         private bool isSpellReady(String Champion, SpellSlot slot) {
             return getChampion("Champion").Spellbook.CanUseSpell(slot) == SpellState.Ready;
         }
