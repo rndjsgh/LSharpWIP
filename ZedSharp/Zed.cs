@@ -67,22 +67,23 @@ namespace ZedSharp {
         public static void doCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
-            if (R.IsReady() && shadowR == null && ZedSharp.menu.Item("useRC").GetValue<bool>())
+            
+
+            if (R.IsReady() && ZedSharp.menu.Item("useRC").GetValue<bool>())
                 R.Cast(target);
 
-            if (W.IsReady() && shadowW == null && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
-                // Vector3 positionBehind = target.Position +
-                //                        Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
+            if (W.IsReady() && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                 W.Cast(target.Position, true);
             }
 
-            if (Player.Distance(target) > LXOrbwalker.GetAutoAttackRange() &&
+            /*if (Player.Distance(target) > LXOrbwalker.GetAutoAttackRange() &&
                 shadowW.Distance(target) < LXOrbwalker.GetAutoAttackRange()) {
                 //TODO second cast W ?
                 if (canGoToShadow("W") && ZedSharp.menu.Item("useWF").GetValue<bool>()) {
                     W.Cast(Player, true); // Check if this works
                 }
-            }
+            }*/ // TODO fix this?
+
 
             if (shadowW != null) {
                 PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
