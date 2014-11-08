@@ -48,19 +48,19 @@
       <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\Igniter.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp">
-      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LeagueSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\LeagueSharp\System\LeagueSharp.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.AppDomainManager">
       <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LeagueSharp.AppDomainManager.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Common">
-      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="LX-Orbwalker">
       <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\LX-Orbwalker.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
       <HintPath>..\..\..\..\..\Desktop\LeagueSharp\System\SharpDX.Direct3D9.dll</HintPath>
@@ -87,6 +87,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Zed.cs" />
     <Compile Include="ZedSharp.cs" />
+    <Compile Include="ZedTargetSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
