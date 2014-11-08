@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -68,8 +66,6 @@ namespace ZedSharp {
 
         public static void doCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-
-            
 
             if (R.IsReady() && ZedSharp.menu.Item("useRC").GetValue<bool>())
                 R.Cast(target);
@@ -179,33 +175,30 @@ namespace ZedSharp {
             }
         }
 
-        public static void checkForSwap(string mode)
-        {
-            switch (mode)
-            {
+        public static void checkForSwap(string mode) {
+            switch (mode) {
                 case "LowHP":
-                    var HPPerc = ZedSharp.menu.Item("SwapHP").GetValue<Slider>().Value;
-                    var myHP = (ObjectManager.Player.Health / ObjectManager.Player.MaxHealth) * 100;
-                    if (myHP <= HPPerc && ZedSharp.menu.Item("SwapHPToggle").GetValue<bool>())
-                    {
-                        if (canGoToShadow("R") && isSafeSwap(shadowR)) R.Cast();
+                    int HPPerc = ZedSharp.menu.Item("SwapHP").GetValue<Slider>().Value;
+                    float myHP = (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100;
+                    if (myHP <= HPPerc && ZedSharp.menu.Item("SwapHPToggle").GetValue<bool>()) {
+                        if (canGoToShadow("R") && isSafeSwap(shadowR)) 
+                            R.Cast();
                     }
                     break;
                 case "OnKill":
-                    if (canGoToShadow("R") && isSafeSwap(shadowR)) R.Cast();
-                    break;
-                default:
+                    if (canGoToShadow("R") && isSafeSwap(shadowR)) 
+                        R.Cast();
                     break;
             }
         }
 
-        public static bool isSafeSwap(Obj_AI_Minion shadow)
-        {
+        public static bool isSafeSwap(Obj_AI_Minion shadow) {
             if (!ZedSharp.menu.Item("SafeRBack").GetValue<bool>()) return true;
             //Idk if 500 is ok, maybe we can increment it a little bit more
-            var enemiesShadow = shadow.Position.CountEnemysInRange(500);
-            var enemiesPlayer = ObjectManager.Player.Position.CountEnemysInRange(500);
-            if (enemiesShadow < enemiesPlayer) return true;
+            int enemiesShadow = shadow.Position.CountEnemysInRange(500);
+            int enemiesPlayer = ObjectManager.Player.Position.CountEnemysInRange(500);
+            if (enemiesShadow < enemiesPlayer) 
+                return true;
             return false;
         }
     }

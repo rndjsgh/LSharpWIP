@@ -143,19 +143,17 @@ namespace ZedSharp {
 
             Obj_AI_Base unit = spell.SpellCaster;
             string name = spell.SData.Name;
-            if (!unit.IsMe) return;
-
-            switch (name) {
-                case "ZedUltMissile":
-                    Zed.getRshad = true;
-                    break;
+            if (unit.IsMe) {
+                switch (name) {
+                    case "ZedUltMissile":
+                        Zed.getRshad = true;
+                        break;
+                }
             }
-
             //"Zed_Base_R_buf_tell.troy" = killable
         }
 
-        private static void OnGameUpdate(EventArgs args)
-        {
+        private static void OnGameUpdate(EventArgs args) {
             Zed.checkForSwap("LowHP");
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
@@ -167,7 +165,7 @@ namespace ZedSharp {
             }
         }
 
-        
+
         private static void OnEndScene(EventArgs args) {
             if (menu.Item("drawHp").GetValue<bool>()) {
                 foreach (
@@ -184,6 +182,5 @@ namespace ZedSharp {
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Drawing.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
         }
-        
     }
 }
