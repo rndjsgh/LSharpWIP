@@ -46,7 +46,13 @@ namespace ZedSharp {
                     }
                 }
             }
-            return false;
+            var dangerLevel = 0;
+            foreach (var DH in DangerousheroNear)
+            {
+                dangerLevel += DH.dangerLevel;
+            }
+            
+            return dangerLevel >= 15;
         }
 
         private bool spellUp(String Champion, SpellSlot slot) {
