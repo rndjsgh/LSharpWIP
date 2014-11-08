@@ -9,7 +9,7 @@ namespace ZedSharp {
         private readonly List<DangerousSpell> dangerousSpells = new List<DangerousSpell>();
 
         private void populateList() {
-            dangerousSpells.Add(new DangerousSpell {ChampName = "Amumu", spell = SpellSlot.R});
+            dangerousSpells.Add(new DangerousSpell {ChampName = "Amumu", spell = SpellSlot.R, danger = 5});
             dangerousSpells.Add(new DangerousSpell
             {ChampName = "Annie", spell = SpellSlot.R, buff = "Pyromania", danger = 5}); //Check buff name
             dangerousSpells.Add(new DangerousSpell
