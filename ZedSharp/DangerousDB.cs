@@ -68,13 +68,6 @@ namespace ZedSharp {
         /// <summary>
         ///     Returns true if the hero has the item.
         /// </summary>
-        public static bool hasItem(string name, Obj_AI_Hero hero) {
-            return hero.InventoryItems.Any(slot => slot.Name == name);
-        }
-
-        /// <summary>
-        ///     Returns true if the hero has the item.
-        /// </summary>
         public static bool hasItem(int id, Obj_AI_Hero hero) {
             return hero.InventoryItems.Any(slot => slot.Id == (ItemId) id);
         }
@@ -86,8 +79,7 @@ namespace ZedSharp {
         public static bool canUseItem(int id, Obj_AI_Hero target) {
             InventorySlot islot = null;
             foreach (
-                InventorySlot slot in
-                    target.InventoryItems.Where(slot => slot.Id == (ItemId) id && target.IsEnemy && target.IsValid)) {
+                InventorySlot slot in target.InventoryItems.Where(slot => slot.Id == (ItemId) id && target.IsEnemy && target.IsValid)) {
                 islot = slot;
             }
             if (islot == null) {
