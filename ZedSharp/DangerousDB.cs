@@ -66,16 +66,36 @@ namespace ZedSharp {
         }
 
         /// <summary>
-        /// Returns true if the hero has the item.
+        ///     Returns true if the hero has the item.
         /// </summary>
         public static bool hasItem(string name, Obj_AI_Hero hero) {
             return hero.InventoryItems.Any(slot => slot.Name == name);
         }
+
         /// <summary>
-        /// Returns true if the hero has the item.
+        ///     Returns true if the hero has the item.
         /// </summary>
         public static bool hasItem(int id, Obj_AI_Hero hero) {
-            return hero.InventoryItems.Any(slot => slot.Id == (ItemId)id);
+            return hero.InventoryItems.Any(slot => slot.Id == (ItemId) id);
+        }
+
+
+        /// <summary>
+        ///     Retruns true if the player has the item and its not on cooldown.
+        /// </summary>
+        public static bool canUseItem(int id, Obj_AI_Hero target) {
+            InventorySlot islot = null;
+            foreach (
+                InventorySlot slot in
+                    target.InventoryItems.Where(slot => slot.Id == (ItemId) id && target.IsEnemy && target.IsValid)) {
+                islot = slot;
+            }
+            if (islot == null) {
+                return false;
+            }
+            int add = Game.Version.Contains("4.19") ? 6 : 4;
+            SpellDataInst inst = target.Spellbook.Spells.FirstOrDefault(spell => (int) spell.Slot == islot.Slot + add);
+            return inst != null && inst.State == SpellState.Ready;
         }
 
         private bool isSpellReady(String Champion, SpellSlot slot) {
