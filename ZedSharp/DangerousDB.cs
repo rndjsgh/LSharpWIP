@@ -43,7 +43,8 @@ namespace ZedSharp {
                     where
                         dangerousSpell.ChampName == enemy.ChampionName &&
                         isSpellReady(enemy.ChampionName, dangerousSpell.spell) &&
-                        enemy.Distance(target) <= enemy.Spellbook.GetSpell(dangerousSpell.spell).SData.CastRange[0]
+                        enemy.Distance(target) <= enemy.Spellbook.GetSpell(dangerousSpell.spell).SData.CastRange[0] &&
+                        (dangerousSpell.buff!=null?enemy.HasBuff(dangerousSpell.buff,true):true)
                     select
                         new DangerousHero
                         {dangerLevel = dangerousSpell.danger, hero = enemy, slot = dangerousSpell.spell}).ToList();
@@ -62,7 +63,7 @@ namespace ZedSharp {
 
             int dangerLevel = DangerousheroNear.Sum(dangerousHero => dangerousHero.dangerLevel);
 
-            return dangerLevel >= 15;
+            return dangerLevel < 15;
         }
 
         /// <summary>
