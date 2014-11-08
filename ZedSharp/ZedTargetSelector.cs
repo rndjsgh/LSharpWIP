@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZedSharp
-{
-    class ZedTargetSelector
-    {
+namespace ZedSharp {
+    class ZedTargetSelector {
         //TODO
     }
 }
