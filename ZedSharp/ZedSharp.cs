@@ -27,7 +27,8 @@ namespace ZedSharp {
         public static Menu menu;
 
         public static HpBarIndicator hpi = new HpBarIndicator();
-
+        public static bool W2;
+        public static bool R2;
 
         public ZedSharp() {
             Console.WriteLine("Zed sharp starting...");
@@ -65,6 +66,8 @@ namespace ZedSharp {
             menu.SubMenu("combo").AddItem(new MenuItem("useEC", "Use E in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useRC", "Use R in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useWF", "Use W to follow").SetValue(true));
+            menu.SubMenu("combo").AddItem(new MenuItem("minQ", "Minimum Q to Hit").SetValue(new Slider(2,1,3)));
+            menu.SubMenu("combo").AddItem(new MenuItem("minE", "Minimum E to Hit").SetValue(new Slider(2, 1, 3)));
 
             menu.AddSubMenu(new Menu("Harass Options", "harass"));
             menu.SubMenu("harass").AddItem(new MenuItem("useQH", "Use Q in harass").SetValue(true));
@@ -82,6 +85,7 @@ namespace ZedSharp {
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
             menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
+            menu.SubMenu("misc").AddItem(new MenuItem("Flee", "Flee Key").SetValue(new KeyBind("S".ToCharArray()[0],KeyBindType.Press))); 
 
             Game.PrintChat("Zed by iJava,DZ191 and DETUKS Loaded.");
         }
@@ -117,9 +121,17 @@ namespace ZedSharp {
 
         private static void OnDeleteObject(GameObject sender, EventArgs args) {
             if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId)
+            {
                 Zed.shadowR = null;
+                R2 = false;
+            }
+
             if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId)
+            {
                 Zed.shadowW = null;
+                W2 = false;
+            }
+                
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
@@ -127,9 +139,15 @@ namespace ZedSharp {
                 var min = sender as Obj_AI_Minion;
                 if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
                     if (Zed.getRshad)
+                    {
                         Zed.shadowR = min;
+                        R2 = true;
+                    }
                     else
+                    {
                         Zed.shadowW = min;
+                        W2 = true;
+                    }       
                 }
             }
 
@@ -147,6 +165,7 @@ namespace ZedSharp {
                 switch (name) {
                     case "ZedUltMissile":
                         Zed.getRshad = true;
+                        R2 = true;
                         break;
                 }
             }
@@ -154,7 +173,9 @@ namespace ZedSharp {
         }
 
         private static void OnGameUpdate(EventArgs args) {
+          //  Game.PrintChat(Zed.canGoToShadow("W").ToString());
             Zed.checkForSwap("LowHP");
+            Zed.Flee();
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady())
@@ -183,7 +204,7 @@ namespace ZedSharp {
 
         private static void onDraw(EventArgs args) {
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
-                Drawing.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
+                Utility.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
         }
     }
 }
