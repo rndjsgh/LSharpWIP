@@ -88,7 +88,7 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Physical);
             LXOrbwalker.ForcedTarget = target;
             var Shuriken = ZedSharp.menu.Item("minQ").GetValue<Slider>().Value;
-
+            var minE = ZedSharp.menu.Item("minE").GetValue<Slider>().Value;
             if (R.IsReady() && !canGoToShadow("R"))
             {
                 R.Cast(target,true);
@@ -167,19 +167,20 @@ namespace ZedSharp {
                 target.Distance(Player.Position) <= E.Range)
             {
                 E.Cast(true);
-            }else if (target.Distance(shadowR.Position) <= E.Range && target.Distance(shadowW.Position) <= E.Range //Double E
+            }else if ((target.Distance(shadowR.Position) <= E.Range && target.Distance(shadowW.Position) <= E.Range //Double E
                 || target.Distance(Player.Position)<= E.Range && target.Distance(shadowW.Position)<=E.Range
                 || target.Distance(Player.Position) <= E.Range && target.Distance(shadowR.Position)<=E.Range)
+                && minE < 3)
             {
                 E.Cast(true);
             }
             else
             {
-                if (target.Distance(shadowR.Position) <= E.Range) //Single E
+                if (target.Distance(shadowR.Position) <= E.Range && minE <2) //Single E
                     E.Cast(true);
-                if (target.Distance(shadowW.Position) <= E.Range)
+                if (target.Distance(shadowW.Position) <= E.Range && minE <2)
                     E.Cast(true);
-                if (target.Distance(Player.Position) <= E.Range)
+                if (target.Distance(Player.Position) <= E.Range && minE <2)
                     E.Cast(true);
             }
             #endregion
