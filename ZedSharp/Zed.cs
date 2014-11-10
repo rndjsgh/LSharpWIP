@@ -105,7 +105,7 @@ namespace ZedSharp {
             Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - ShadowPos)*W.Range;
             if (!canGoToShadow("W") && W.IsReady()) {
                 Game.PrintChat("W2 " + ZedSharp.W2);
-                W.Cast(new Vector3(shadowPos.X,shadowPos.Y,target.ServerPosition.Z), false);
+                W.Cast(new Vector3(shadowPos.X,shadowPos.Y,target.ServerPosition.Z));
                 ZedSharp.W2 = true;
                 Game.PrintChat("W2 Now: "+ZedSharp.W2);
             }
