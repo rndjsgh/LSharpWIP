@@ -72,10 +72,17 @@ namespace ZedSharp {
                 if (W.IsReady() && target.Distance(Player) < W.Range && !canGoToShadow("W")) {
                     W.Cast(target.Position, true);
                     ZedSharp.W2 = true;
+                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.High) {
+                        Q.Cast(target, true, true);
+                    }
                 }
                 else {
                     if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
                         Q.Cast(target, true, true); // Normal 
+                    }
+
+                    if (E.IsReady() && Player.Distance(target) <= E.Range) {
+                        E.Cast(true);
                     }
                 }
             }
@@ -188,7 +195,7 @@ namespace ZedSharp {
             if (ListOfEnemies.Count > 0 && E.IsReady()) E.Cast(true);
         }
 
-        public static bool canDoCombo(SpellSlot[] sp) {
+        private static bool canDoCombo(IEnumerable<SpellSlot> sp) {
             float totalCost = sp.Sum(sp1 => Player.Spellbook.GetManaCost(sp1));
             return Player.Mana >= totalCost;
         }
@@ -220,8 +227,6 @@ namespace ZedSharp {
                 //Game.PrintChat(Wdata.Name);
 
                 if (!canGoToShadow("W") && W.IsReady()) {
-                    Vector3 positionBehind = target.Position +
-                                             Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
                     W.Cast(target.Position, true);
                     ZedSharp.W2 = true;
                 }
@@ -270,7 +275,7 @@ namespace ZedSharp {
             }
         }
 
-        public static bool isSafeSwap(Obj_AI_Minion shadow) {
+        private static bool isSafeSwap(Obj_AI_Minion shadow) {
             if (!ZedSharp.menu.Item("SafeRBack").GetValue<bool>()) return true;
             //Idk if 500 is ok, maybe we can increment it a little bit more
             int enemiesShadow = shadow.Position.CountEnemysInRange(500);
