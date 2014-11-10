@@ -24,7 +24,6 @@ namespace ZedSharp {
         public static Obj_AI_Minion shadowW;
         public static bool getRshad = false;
         public static Obj_AI_Minion shadowR;
-
         public static HitChance CustomHitChance = HitChance.Low;
 
         public static void setSkillshots() {
@@ -57,11 +56,11 @@ namespace ZedSharp {
         public static bool canGoToShadow(string type) {
             // TODO Shadow param W or R
             if (type == "W") {
-                if (Wdata.Name == "zedw2")
+                if (ZedSharp.W2)
                     return true;
             }
             if (type == "R") {
-                if (Rdata.Name == "ZedR2")
+                if (ZedSharp.R2)
                     return true;
             }
             return false;
@@ -71,8 +70,9 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
 
             if (Q.IsReady() && ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (W.IsReady() && target.Distance(Player) < W.Range) {
+                if (W.IsReady() && target.Distance(Player) < W.Range && !canGoToShadow("W")) {
                     W.Cast(target.Position, true);
+                    ZedSharp.W2 = true;
                 }
                 else {
                     if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
@@ -93,10 +93,13 @@ namespace ZedSharp {
             {
                 R.Cast(target,true);
             }
-            var shadowPos = getOptimalShadowPlacement(target.Position);
+            //Fix
+            var shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*W.Range;
             if (shadowPos != Vector3.Zero && !canGoToShadow("W") && W.IsReady())
             {
+                Game.PrintChat("W2 "+ZedSharp.W2.ToString());
                 W.Cast(shadowPos,true);
+                ZedSharp.W2 = true;
             }
             PredictionOutput QPrediction = Q.GetPrediction(target);
             PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput
@@ -219,11 +222,14 @@ namespace ZedSharp {
         }
         public static void doHarass() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-
-            if (W.IsReady() && !canGoToShadow("W")) {
+            //Game.PrintChat(Wdata.Name);
+            
+            if (!canGoToShadow("W") && W.IsReady())
+            { 
                 Vector3 positionBehind = target.Position +
                                          Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
                 W.Cast(target.Position, true);
+                ZedSharp.W2 = true;
             }
             PredictionOutput QPrediction = Q.GetPrediction(target);
             PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
@@ -247,8 +253,9 @@ namespace ZedSharp {
                 Q.Cast(CustomQPredictionW.CastPosition, true);
             }
             if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range ||
-                target.Distance(shadowW.Position) <= E.Range) {
-                E.CastOnUnit(ObjectManager.Player, true);
+                target.Distance(shadowW.Position) <= E.Range)
+            {
+                E.Cast(true);
             }
         }
 

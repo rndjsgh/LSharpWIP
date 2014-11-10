@@ -27,7 +27,8 @@ namespace ZedSharp {
         public static Menu menu;
 
         public static HpBarIndicator hpi = new HpBarIndicator();
-
+        public static bool W2;
+        public static bool R2;
 
         public ZedSharp() {
             Console.WriteLine("Zed sharp starting...");
@@ -120,9 +121,17 @@ namespace ZedSharp {
 
         private static void OnDeleteObject(GameObject sender, EventArgs args) {
             if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId)
+            {
                 Zed.shadowR = null;
+                R2 = false;
+            }
+
             if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId)
+            {
                 Zed.shadowW = null;
+                W2 = false;
+            }
+                
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
@@ -130,9 +139,15 @@ namespace ZedSharp {
                 var min = sender as Obj_AI_Minion;
                 if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
                     if (Zed.getRshad)
+                    {
                         Zed.shadowR = min;
+                        R2 = true;
+                    }
                     else
+                    {
                         Zed.shadowW = min;
+                        W2 = true;
+                    }       
                 }
             }
 
@@ -150,6 +165,7 @@ namespace ZedSharp {
                 switch (name) {
                     case "ZedUltMissile":
                         Zed.getRshad = true;
+                        R2 = true;
                         break;
                 }
             }
@@ -157,6 +173,7 @@ namespace ZedSharp {
         }
 
         private static void OnGameUpdate(EventArgs args) {
+          //  Game.PrintChat(Zed.canGoToShadow("W").ToString());
             Zed.checkForSwap("LowHP");
             Zed.Flee();
             switch (LXOrbwalker.CurrentMode) {
