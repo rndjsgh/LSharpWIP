@@ -25,7 +25,7 @@ namespace ZedSharp {
         public static bool getRshad = false;
         public static Obj_AI_Minion shadowR;
 
-        public static HitChance CustomHitChance = HitChance.High;
+        public static HitChance CustomHitChance = HitChance.Low;
 
         public static void setSkillshots() {
             Q.SetSkillshot(Qdata.SData.SpellCastTime, Qdata.SData.LineWidth, Qdata.SData.MissileSpeed, false,
