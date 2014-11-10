@@ -73,7 +73,7 @@ namespace ZedSharp {
                 }
                 else {
                     if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
-                        Q.Cast(target, true, true);
+                        Q.Cast(target, true, true); // Normal 
                     }
                 }
             }
@@ -89,8 +89,6 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
             if (W.IsReady()) {
-                Vector3 positionBehind = target.Position +
-                                         Vector3.Normalize(target.Position - ObjectManager.Player.Position)*200;
                 W.Cast(target.Position, true);
             }
             PredictionOutput QPrediction = Q.GetPrediction(target);
