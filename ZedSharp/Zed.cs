@@ -64,80 +64,25 @@ namespace ZedSharp {
             return false;
         }
 
-        public static void doCombo() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
+        public static void normalCombo() {
+            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
 
-            if (R.IsReady() && ZedSharp.menu.Item("useRC").GetValue<bool>())
-                R.Cast(target);
-
-            if (W.IsReady() && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
-                W.Cast(target.Position, true);
-            }
-
-            /*if (Player.Distance(target) > LXOrbwalker.GetAutoAttackRange() &&
-                shadowW.Distance(target) < LXOrbwalker.GetAutoAttackRange()) {
-                //TODO second cast W ?
-                if (canGoToShadow("W") && ZedSharp.menu.Item("useWF").GetValue<bool>()) {
-                    W.Cast(Player, true); // Check if this works
+            if (Q.IsReady() && ZedSharp.menu.Item("useQC").GetValue<bool>()) {
+                if (W.IsReady() && target.Distance(Player) < W.Range) {
+                    W.Cast(target.Position, true);
                 }
-            }*/ // TODO fix this?
-
-
-            if (shadowW != null) {
-                PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
-                    Unit = target,
-                    Delay = Q.Delay,
-                    Radius = Q.Width,
-                    From = shadowW.Position, //We check for prediction in advance
-                    Range = Q.Range,
-                    Collision = false,
-                    Type = Q.Type,
-                    RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                    Aoe = true
-                });
-
-                if (shadowR != null) {
-                    PredictionOutput CustomQPredictionR = Prediction.GetPrediction(new PredictionInput {
-                        Unit = target,
-                        Delay = Q.Delay,
-                        Radius = Q.Width,
-                        From = shadowR.Position, //We check for prediction in advance
-                        Range = Q.Range,
-                        Collision = false,
-                        Type = Q.Type,
-                        RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                        Aoe = true
-                    });
-
-                    if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                        if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range &&
-                            Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
-                            Q.Cast(Q.GetPrediction(target, true).CastPosition, true);
-                        }
-                        if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
-                            CustomQPredictionW.Hitchance >= CustomHitChance) {
-                            Q.Cast(CustomQPredictionW.CastPosition, true);
-                        }
-                        if (Q.IsReady() && target.Distance(shadowR.Position) <= Q.Range &&
-                            CustomQPredictionR.Hitchance >= CustomHitChance) {
-                            Q.Cast(CustomQPredictionR.CastPosition, true);
-                        }
+                else {
+                    if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
+                        Q.Cast(target, true, true);
                     }
                 }
             }
+        }
 
-            if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
-                target.Distance(Player) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
-                // TODO check shadow position with enemy position so we can cast e effectivly.
-                E.CastOnUnit(ObjectManager.Player);
-            }
+        public static void doCombo() {
+            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
-            foreach (
-                Obj_AI_Hero enemy in
-                    ObjectManager.Get<Obj_AI_Hero>().Where(
-                        hero => hero.IsValidTarget() && hero.HasBuff("zedulttargetmark"))) {
-                LXOrbwalker.ForcedTarget = enemy;
-            }
+            
         }
 
         public static void doHarass() {
@@ -181,12 +126,12 @@ namespace ZedSharp {
                     int HPPerc = ZedSharp.menu.Item("SwapHP").GetValue<Slider>().Value;
                     float myHP = (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100;
                     if (myHP <= HPPerc && ZedSharp.menu.Item("SwapHPToggle").GetValue<bool>()) {
-                        if (canGoToShadow("R") && isSafeSwap(shadowR)) 
+                        if (canGoToShadow("R") && isSafeSwap(shadowR))
                             R.Cast();
                     }
                     break;
                 case "OnKill":
-                    if (canGoToShadow("R") && isSafeSwap(shadowR)) 
+                    if (canGoToShadow("R") && isSafeSwap(shadowR))
                         R.Cast();
                     break;
             }
@@ -197,7 +142,7 @@ namespace ZedSharp {
             //Idk if 500 is ok, maybe we can increment it a little bit more
             int enemiesShadow = shadow.Position.CountEnemysInRange(500);
             int enemiesPlayer = ObjectManager.Player.Position.CountEnemysInRange(500);
-            if (enemiesShadow < enemiesPlayer) 
+            if (enemiesShadow < enemiesPlayer)
                 return true;
             return false;
         }

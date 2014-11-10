@@ -131,12 +131,12 @@ namespace ZedSharp {
                     else
                         Zed.shadowW = min;
                 }
+            }
 
-                if (sender.Name == "Zed_Base_R_buf_tell.troy" && sender.IsEnemy) {
-                    //TODO check if this works it means the enemy is killable with ult and you can then leave him and return to ult shadow if it is still active.
-                    //TODO targetKillable = true - alos check hp and if below % go back to RShadow?
-                    Zed.checkForSwap("OnKill");
-                }
+            if (sender.Name == "Zed_Base_R_buf_tell.troy" && sender.IsEnemy) {
+                //TODO check if this works it means the enemy is killable with ult and you can then leave him and return to ult shadow if it is still active.
+                //TODO targetKillable = true - alos check hp and if below % go back to RShadow?
+                Zed.checkForSwap("OnKill");
             }
 
             var spell = (Obj_SpellMissile) sender;
@@ -157,7 +157,10 @@ namespace ZedSharp {
             Zed.checkForSwap("LowHP");
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
-                    Zed.doCombo();
+                    if (Zed.R.IsReady())
+                        Zed.doCombo();
+                    else
+                        Zed.normalCombo();
                     break;
                 case LXOrbwalker.Mode.Harass:
                     Zed.doHarass();
