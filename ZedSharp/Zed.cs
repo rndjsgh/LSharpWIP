@@ -132,23 +132,13 @@ namespace ZedSharp {
             }else if (((QPrediction.Hitchance >= CustomHitChance && CustomQPredictionR.Hitchance >= CustomHitChance) 
                 || (QPrediction.Hitchance >= CustomHitChance && CustomQPredictionW.Hitchance>=CustomHitChance)) && Shuriken<3) //Q-R / q-W Prediction
             {
-                var thePred = QPrediction.Hitchance >= CustomQPredictionR.Hitchance
-                    ? QPrediction
-                    : CustomQPredictionR;
-                var thePred2 = QPrediction.Hitchance >= CustomQPredictionW.Hitchance
-                    ? QPrediction
-                    : CustomQPredictionW;
-                var thePred3 = thePred.Hitchance >= thePred2.Hitchance
-                    ? thePred.CastPosition
-                    : thePred2.CastPosition;
-                Q.Cast(thePred3,true);
+                
+                Q.Cast(QPrediction.CastPosition,true);
             }
             else if ((CustomQPredictionW.Hitchance >= CustomHitChance && CustomQPredictionR.Hitchance >= CustomHitChance) && Shuriken<3) //R-W Prediction
             {
-                var thePred = CustomQPredictionR.Hitchance >= CustomQPredictionW.Hitchance
-                    ? CustomQPredictionR.CastPosition
-                    : CustomQPredictionW.CastPosition;
-                Q.Cast(thePred,true);
+                
+                Q.Cast(CustomQPredictionR.CastPosition,true);
             }
             else
             {
