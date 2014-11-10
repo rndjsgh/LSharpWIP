@@ -95,15 +95,19 @@ namespace ZedSharp {
             LXOrbwalker.ForcedTarget = target;
             int Shuriken = ZedSharp.menu.Item("minQ").GetValue<Slider>().Value;
             int minE = ZedSharp.menu.Item("minE").GetValue<Slider>().Value;
-            if (R.IsReady() && !canGoToShadow("R")) {
+            var ShadowPos = shadowR != null ? shadowR.Position:Vector3.Zero;
+            if (R.IsReady() && !canGoToShadow("R"))
+            {
+                ShadowPos = Player.ServerPosition;
                 R.Cast(target, true);
             }
             //Fix
-            Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*W.Range;
-            if (shadowPos != Vector3.Zero && !canGoToShadow("W") && W.IsReady()) {
+            Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - ShadowPos)*W.Range;
+            if (!canGoToShadow("W") && W.IsReady()) {
                 Game.PrintChat("W2 " + ZedSharp.W2);
-                W.Cast(shadowPos, true);
+                W.Cast(new Vector3(shadowPos.X,shadowPos.Y,target.ServerPosition.Z), false);
                 ZedSharp.W2 = true;
+                Game.PrintChat("W2 Now: "+ZedSharp.W2);
             }
             PredictionOutput QPrediction = Q.GetPrediction(target);
             PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {

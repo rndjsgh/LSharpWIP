@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Drawing;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace ZedSharp {
     //TODO idea, use EvadeSpellDatabase or .dll to have an option to use ultimate to dodge dangeruous spells like Grag ult when evade can't dodge, so it doesn't waste ur R ? 
@@ -202,7 +203,11 @@ namespace ZedSharp {
             }
         }
 
-        private static void onDraw(EventArgs args) {
+        private static void onDraw(EventArgs args)
+        {
+            var pl = ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy).FirstOrDefault();
+            Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position) * Zed.W.Range;
+            Utility.DrawCircle(shadowPos, 100, Color.Yellow);
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Utility.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
         }
