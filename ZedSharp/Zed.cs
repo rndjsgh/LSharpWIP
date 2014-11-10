@@ -69,7 +69,7 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
 
             if (Q.IsReady() && ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (W.IsReady() && target.Distance(Player) < W.Range && !canGoToShadow("W")) {
+                if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && !canGoToShadow("W")) {
                     W.Cast(target.Position, true);
                     ZedSharp.W2 = true;
                     if (Q.GetPrediction(target, true).Hitchance >= HitChance.High) {
