@@ -23,7 +23,7 @@ namespace ZedSharp {
         public static Obj_AI_Minion shadowW;
         public static bool getRshad = false;
         public static Obj_AI_Minion shadowR;
-        public static HitChance CustomHitChance = HitChance.Low;
+        public static HitChance CustomHitChance = HitChance.Medium;
 
         public static void setSkillshots() {
             Q.SetSkillshot(Qdata.SData.SpellCastTime, Qdata.SData.LineWidth, Qdata.SData.MissileSpeed, false,
@@ -102,8 +102,8 @@ namespace ZedSharp {
                 R.Cast(target, true);
             }
             //Fix
-            Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - ShadowPos)*W.Range;
-            if (!canGoToShadow("W") && W.IsReady()) {
+            Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*W.Range;
+            if (!canGoToShadow("W") && W.IsReady() && Player.Distance(target)<=300) {
                 Game.PrintChat("W2 " + ZedSharp.W2);
                 W.Cast(new Vector3(shadowPos.X,shadowPos.Y,target.ServerPosition.Z));
                 ZedSharp.W2 = true;
