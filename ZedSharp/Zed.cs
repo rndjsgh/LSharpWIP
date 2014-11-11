@@ -95,6 +95,9 @@ namespace ZedSharp {
                     if (Q.GetPrediction(target, true).Hitchance >= HitChance.High) {
                         Q.Cast(target, true, true);
                     }
+                    if (E.IsReady() && shadowW.Distance(target) <= E.Range || Player.Distance(target) <= E.Range) {
+                        E.Cast(true);
+                    }
                 }
                 else {
                     if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
@@ -208,29 +211,26 @@ namespace ZedSharp {
         }
 
 
-        public static void doLaneCombo(Obj_AI_Base target) {
+        public static void doLaneCombo(Obj_AI_Base target) { // TODO kinda works Sometime :^)
             try {
                 float dist = target.Distance(Player);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
                     canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
                     R.Cast(target);
-                    return;
                 }
-                //eather casts 2 times or 0 get it to cast 1 time
-                if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad && shadowR != null &&
-                    LastCastedSpell.LastCastPacketSent.Slot != SpellSlot.W) {
+                //eather casts 2 times or 0 get it to cast 1 time TODO
+                if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad) {
                     PredictionOutput po = Prediction.GetPrediction(target, 0.350f);
                     W.Cast(V2E(shadowR.Position, po.UnitPosition, E.Range));
+                    ZedSharp.W2 = true;
                     Console.WriteLine("Cast WWW cmnn");
-                    return;
                 }
 
-                if (E.IsReady() && shadowW != null && shadowR != null) {
+                if (E.IsReady() && shadowW != null || shadowR != null) {
                     E.Cast();
-                    return;
                 }
 
-                if (Q.IsReady() && !E.IsReady() && shadowW != null && shadowR != null) {
+                if (Q.IsReady() && shadowW != null && shadowR != null) {
                     float midDist = dist;
                     midDist += target.Distance(shadowR);
                     midDist += target.Distance(shadowW);
@@ -240,11 +240,10 @@ namespace ZedSharp {
                         Console.WriteLine("Cast QQQQ");
 
                         Q.Cast(po.UnitPosition);
-                        return;
                     }
                 }
 
-                if (shadowR != null && !E.IsReady() && !W.IsReady() && !Q.IsReady()) {
+                if (shadowR != null) {
                     castItemsFull(target);
                 }
             }
@@ -257,6 +256,7 @@ namespace ZedSharp {
         private static void castItemsFull(Obj_AI_Base target) {
             if (target.Distance(Player) < 500) {
                 sumItems.cast(SummonerItems.ItemIds.Ghostblade);
+                sumItems.castIgnite((Obj_AI_Hero) target);
             }
             if (target.Distance(Player) < 500) {
                 sumItems.cast(SummonerItems.ItemIds.BotRK, target);
@@ -312,38 +312,36 @@ namespace ZedSharp {
         public static void doHarass() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
-            if (W.IsReady()) {
-                //Game.PrintChat(Wdata.Name);
-
-                if (!canGoToShadow("W") && W.IsReady()) {
+            if (W.IsReady() && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
+                if (LastCastedSpell.LastCastPacketSent.Slot != SpellSlot.W) {
                     W.Cast(target.Position, true);
-                    ZedSharp.W2 = true;
+                    Utility.DelayAction.Add(100, castQ);
                 }
-                PredictionOutput QPrediction = Q.GetPrediction(target);
-                PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
-                    Unit = target,
-                    Delay = Q.Delay,
-                    Radius = Q.Width,
-                    From = shadowW.Position, //We check for prediction in advance
-                    Range = Q.Range,
-                    Collision = false,
-                    Type = Q.Type,
-                    RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                    Aoe = false
-                });
+            }
+            else {
+                castQ();
+            }
 
-                if (Q.IsReady() && target.Distance(ObjectManager.Player) <= Q.Range &&
-                    QPrediction.Hitchance >= CustomHitChance) {
-                    Q.Cast(QPrediction.CastPosition, true);
-                }
-                if (Q.IsReady() && target.Distance(shadowW.Position) <= Q.Range &&
-                    CustomQPredictionW.Hitchance >= CustomHitChance) {
-                    Q.Cast(CustomQPredictionW.CastPosition, true);
-                }
-                if (E.IsReady() && target.Distance(ObjectManager.Player) <= E.Range ||
-                    target.Distance(shadowW.Position) <= E.Range) {
-                    E.Cast(true);
-                }
+            if (E.IsReady() && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
+                if (target.Distance(Player) <= E.Range || target.Distance(shadowW) <= E.Range)
+                    E.Cast();
+            }
+        }
+
+        private static void castQ() {
+            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + Q.Range, SimpleTs.DamageType.Physical);
+            if (!Q.IsReady() || ZedSharp.menu.Item("useQC").GetValue<bool>()) return;
+
+            Q.UpdateSourcePosition(Player.Position, Player.Position);
+
+            if (shadowW != null) {
+                Q.UpdateSourcePosition(shadowW.Position, shadowW.Position);
+                Q.Cast(target, true, true);
+                Q.UpdateSourcePosition(Player.Position, Player.Position);
+                Q.Cast(target, true, true);
+            }
+            else if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
+                Q.Cast(target, true, true);
             }
         }
 

@@ -67,7 +67,7 @@ namespace ZedSharp {
             menu.SubMenu("combo").AddItem(new MenuItem("useEC", "Use E in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useRC", "Use R in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useWF", "Use W to follow").SetValue(true));
-            menu.SubMenu("combo").AddItem(new MenuItem("minQ", "Minimum Q to Hit").SetValue(new Slider(2,1,3)));
+            menu.SubMenu("combo").AddItem(new MenuItem("minQ", "Minimum Q to Hit").SetValue(new Slider(2, 1, 3)));
             menu.SubMenu("combo").AddItem(new MenuItem("minE", "Minimum E to Hit").SetValue(new Slider(2, 1, 3)));
 
             menu.AddSubMenu(new Menu("Harass Options", "harass"));
@@ -86,7 +86,8 @@ namespace ZedSharp {
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
             menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
-            menu.SubMenu("misc").AddItem(new MenuItem("Flee", "Flee Key").SetValue(new KeyBind("S".ToCharArray()[0],KeyBindType.Press))); 
+            menu.SubMenu("misc").AddItem(
+                new MenuItem("Flee", "Flee Key").SetValue(new KeyBind("S".ToCharArray()[0], KeyBindType.Press)));
 
             Game.PrintChat("Zed by iJava,DZ191 and DETUKS Loaded.");
         }
@@ -121,34 +122,29 @@ namespace ZedSharp {
         private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args) {}
 
         private static void OnDeleteObject(GameObject sender, EventArgs args) {
-            if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId)
-            {
+            if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId) {
                 Zed.shadowR = null;
                 R2 = false;
             }
 
-            if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId)
-            {
+            if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId) {
                 Zed.shadowW = null;
                 W2 = false;
             }
-                
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
             if (sender is Obj_AI_Minion) {
                 var min = sender as Obj_AI_Minion;
                 if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
-                    if (Zed.getRshad)
-                    {
+                    if (Zed.getRshad) {
                         Zed.shadowR = min;
                         R2 = true;
                     }
-                    else
-                    {
+                    else {
                         Zed.shadowW = min;
                         W2 = true;
-                    }       
+                    }
                 }
             }
 
@@ -174,13 +170,14 @@ namespace ZedSharp {
         }
 
         private static void OnGameUpdate(EventArgs args) {
-          //  Game.PrintChat(Zed.canGoToShadow("W").ToString());
+            //  Game.PrintChat(Zed.canGoToShadow("W").ToString());
             Zed.checkForSwap("LowHP");
             Zed.Flee();
+            Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady())
-                        Zed.doCombo();
+                        Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
                     break;
@@ -203,10 +200,9 @@ namespace ZedSharp {
             }
         }
 
-        private static void onDraw(EventArgs args)
-        {
-            var pl = ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy).FirstOrDefault();
-            Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position) * Zed.W.Range;
+        private static void onDraw(EventArgs args) {
+            Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy).FirstOrDefault();
+            Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
             Utility.DrawCircle(shadowPos, 100, Color.Yellow);
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Utility.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
