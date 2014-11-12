@@ -121,8 +121,8 @@ namespace ZedSharp {
 
         private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsMe) return;
-            if (args.SData.Name == "ZedShadowDash") Zed.getWshad = true;
+           // if (!sender.IsMe) return;
+            //if (args.SData.Name == "ZedShadowDash") Zed.getWshad = true;
             //Game.PrintChat(args.SData.Name);
         }
 
@@ -130,11 +130,13 @@ namespace ZedSharp {
             if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId) {
                 Zed.shadowR = null;
                 R2 = false;
+                Zed.getRshad = false;
             }
 
             if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId) {
                 Zed.shadowW = null;
                 W2 = false;
+                Zed.getWshad = false;
             }
         }
 
