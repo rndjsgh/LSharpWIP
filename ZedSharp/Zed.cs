@@ -89,13 +89,16 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
 
             if (Q.IsReady() && ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && !canGoToShadow("W")) {
+                if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && !canGoToShadow("W"))
+                {
                     W.Cast(target.Position, true);
                     ZedSharp.W2 = true;
-                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.High) {
+                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.High)
+                    {
                         Q.Cast(target, true, true);
                     }
-                    if (E.IsReady() && shadowW.Distance(target) <= E.Range || Player.Distance(target) <= E.Range) {
+                    if (E.IsReady() && shadowW.Distance(target) <= E.Range || Player.Distance(target) <= E.Range)
+                    {
                         E.Cast(true);
                     }
                 }
@@ -212,17 +215,21 @@ namespace ZedSharp {
 
 
         public static void doLaneCombo(Obj_AI_Base target) { // TODO kinda works Sometime :^)
-            try {
-                float dist = target.Distance(Player);
+            try
+            {
+                float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
                     canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
                     R.Cast(target);
                 }
                 //eather casts 2 times or 0 get it to cast 1 time TODO
-                if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad) {
-                    PredictionOutput po = Prediction.GetPrediction(target, 0.350f);
-                    W.Cast(V2E(shadowR.Position, po.UnitPosition, E.Range));
-                    ZedSharp.W2 = true;
+               // Game.PrintChat("W2 "+ZedSharp.W2);
+                
+                PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
+                Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position) * E.Range;
+                if (W.IsReady() && E.IsReady() && !getWshad) {
+                    //V2E(shadowR.Position, po.UnitPosition, E.Range)
+                    W.Cast(shadowPos);
                     Console.WriteLine("Cast WWW cmnn");
                 }
 
@@ -248,7 +255,7 @@ namespace ZedSharp {
                 }
             }
             catch (Exception ex) {
-                Console.WriteLine(ex);
+                //Console.WriteLine(ex);
             }
         }
 
