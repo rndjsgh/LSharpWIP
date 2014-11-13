@@ -160,7 +160,7 @@ namespace ZedSharp {
                 foreach (
                     Obj_AI_Hero newtarget in
                         ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
-                            enemy => enemy.HasBuff("zedulttargetmark"))) {
+                            enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
                     target = newtarget;
                 }
 
