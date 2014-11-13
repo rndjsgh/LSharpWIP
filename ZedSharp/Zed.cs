@@ -113,13 +113,15 @@ namespace ZedSharp {
                 }
             }
 
+            if (ZedSharp.menu.Item("useQC").GetValue<bool>())
+                if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
+                    Q.Cast(target, true, true);
+
             if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
                 Player.Distance(target) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
                 E.Cast(true);
             }
 
-            if (ZedSharp.menu.Item("useQC").GetValue<bool>())
-                Utility.DelayAction.Add(100, castQ);
         }
 
         private static bool isKillableShadowCoax(Obj_AI_Hero target) {
@@ -266,24 +268,8 @@ namespace ZedSharp {
             }
 
             if (ZedSharp.menu.Item("useQH").GetValue<bool>())
-                Utility.DelayAction.Add(100, castQ);
-        }
-
-        private static void castQ() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + Q.Range, SimpleTs.DamageType.Physical);
-            if (!Q.IsReady() || ZedSharp.menu.Item("useQC").GetValue<bool>()) return;
-
-            Q.UpdateSourcePosition(Player.Position, Player.Position);
-
-            if (shadowW != null && getWshad) {
-                Q.UpdateSourcePosition(shadowW.Position, shadowW.Position);
-                Q.Cast(target, true, true);
-                Q.UpdateSourcePosition(Player.Position, Player.Position);
-                Q.Cast(target, true, true);
-            }
-            else if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
-                Q.Cast(target, true, true);
-            }
+                if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
+                    Q.Cast(target, true, true);
         }
 
         public static void checkForSwap(string mode) {
