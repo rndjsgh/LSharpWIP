@@ -211,7 +211,8 @@ namespace ZedSharp {
         }
 
 
-        public static void doLaneCombo(Obj_AI_Base target) { // TODO kinda works Sometime :^)
+        public static void doLaneCombo(Obj_AI_Base target) {
+            // TODO kinda works Sometime :^)
             try {
                 float dist = target.Distance(Player);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
@@ -238,7 +239,6 @@ namespace ZedSharp {
                     PredictionOutput po = Prediction.GetPrediction(target, delay*1.1f);
                     if (po.Hitchance > HitChance.Low) {
                         Console.WriteLine("Cast QQQQ");
-
                         Q.Cast(po.UnitPosition);
                     }
                 }
