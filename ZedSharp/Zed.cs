@@ -122,10 +122,10 @@ namespace ZedSharp {
             return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG >=
                    health;
         }
-        public static void shadowCoax()
+        public static void shadowCoax(Obj_AI_Hero target)
         {
-            var target =
-                ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
+            //var target =
+            //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
             if (target == null || !canDoCombo(new[] { SpellSlot.Q, SpellSlot.E, SpellSlot.R })) return;
             if(W.IsReady() && canGoToShadow("W") && shadowW!= null)
             {
@@ -145,7 +145,8 @@ namespace ZedSharp {
             }
             LXOrbwalker.ForcedTarget = target;
             if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-            if (canGoToShadow("R") && shadowR != null)
+            sumItems.castIgnite(target);
+            if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking)
             {
                 R.Cast();
             }
@@ -153,7 +154,8 @@ namespace ZedSharp {
         public static void doLaneCombo(Obj_AI_Base target) { // TODO kinda works Sometime :^)
             try
             {
-                if (E.IsReady() && Q.IsReady() && shadowW!=null && LXOrbwalker.CanAttack() && isKillableShadowCoax((Obj_AI_Hero)target)) { shadowCoax();
+                if (E.IsReady() && Q.IsReady() && shadowW!=null && LXOrbwalker.CanAttack() &&  canGoToShadow("W") && isKillableShadowCoax((Obj_AI_Hero)target) && target.Distance(shadowW.Position)<=R.Range) { 
+                    shadowCoax((Obj_AI_Hero)target);
                     return;
                 }
                 //Tried to Add shadow Coax
