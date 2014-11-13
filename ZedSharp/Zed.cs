@@ -97,34 +97,34 @@ namespace ZedSharp {
         }
 
         public static void normalCombo() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
+            Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
             if (Environment.TickCount - LastWCast < 300) return;
             LastWCast = Environment.TickCount;
-            if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad) {
+            if (W.IsReady() && target.Distance(Player) < W.Range && shadowW == null && !getWshad) {
                 if (ZedSharp.menu.Item("useWC").GetValue<bool>())
                     W.Cast(target.Position, true);
 
                 if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W") &&
                     ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                     if (target.Distance(shadowW) < Q.Range + 600)
-                        // if target is lower then Q range + flash range = 600?!?? then follow W.
                         W.Cast(true);
                 }
             }
 
             if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (shadowW == null && !getWshad) {
-                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium &&
-                        Player.Distance(target) <= Q.Range) {
-                        Q.Cast(target, true, true);
-                    }
-                }
-                if (shadowW != null && getWshad) {
-                    if (target.Distance(Player) <= Q.Range || target.Distance(shadowW) <= Q.Range) {
-                        if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium) {
+                if (shadowW != null) {
+                    Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
+                    if (Q.IsReady()) {
+                        if (target.Distance(shadowW) <= Q.Range) {
                             Q.Cast(target, true, true);
                         }
+                    }
+                }
+                else {
+                    if (target.Distance(Player) <= Q.Range &&
+                        Q.GetPrediction(target, true).Hitchance >= HitChance.Medium && Q.IsReady()) {
+                        Q.Cast(target, true, true);
                     }
                 }
             }
@@ -172,11 +172,11 @@ namespace ZedSharp {
         public static void doLaneCombo(Obj_AI_Base target) {
             // TODO kinda works Sometime :^)
             try {
-              //  if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
-               //     isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
-              //      shadowCoax((Obj_AI_Hero) target);
-              //      return;
-               // }
+                //  if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
+                //     isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
+                //      shadowCoax((Obj_AI_Hero) target);
+                //      return;
+                // }
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
@@ -186,12 +186,12 @@ namespace ZedSharp {
                 //eather casts 2 times or 0 get it to cast 1 time TODO fixed
                 // Game.PrintChat("W2 "+ZedSharp.W2);
 
-              //  foreach (
-             //       Obj_AI_Hero newtarget in
-              //          ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
-              //              enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
-             //       target = newtarget;
-             //   }
+                //  foreach (
+                //       Obj_AI_Hero newtarget in
+                //          ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
+                //              enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
+                //       target = newtarget;
+                //   }
 
                 //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
                 Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
@@ -265,7 +265,7 @@ namespace ZedSharp {
         }
 
         public static void doHarass() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
+            Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
             if (Environment.TickCount - LastWCast < 300) return;
             LastWCast = Environment.TickCount;
@@ -280,20 +280,22 @@ namespace ZedSharp {
             }
 
             if (ZedSharp.menu.Item("useQH").GetValue<bool>()) {
-                if (shadowW == null && !getWshad) {
-                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium &&
-                        Player.Distance(target) <= Q.Range) {
-                        Q.Cast(target, true, true);
-                    }
-                }
-                if (shadowW != null && getWshad) {
-                    if (target.Distance(Player) <= Q.Range || target.Distance(shadowW) <= Q.Range) {
-                        if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium) {
+                if (shadowW != null) {
+                    Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
+                    if (Q.IsReady()) {
+                        if (target.Distance(shadowW) <= Q.Range) {
                             Q.Cast(target, true, true);
                         }
                     }
                 }
+                else {
+                    if (target.Distance(Player) <= Q.Range &&
+                        Q.GetPrediction(target, true).Hitchance >= HitChance.Medium && Q.IsReady()) {
+                        Q.Cast(target, true, true);
+                    }
+                }
             }
+
         }
 
         public static void checkForSwap(string mode) {
