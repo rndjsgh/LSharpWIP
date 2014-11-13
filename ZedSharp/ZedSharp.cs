@@ -210,7 +210,8 @@ namespace ZedSharp {
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady())
-                        Utility.DelayAction.Add(310,() => Zed.doLaneCombo(target));
+                        // Utility.DelayAction.Add(310,() => Zed.doLaneCombo(target));
+                        Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
                     break;

@@ -39,7 +39,7 @@ namespace ZedSharp {
         public static bool getWshad = false;
         public static Obj_AI_Minion shadowR;
         public static HitChance CustomHitChance = HitChance.Medium;
-
+        public static float LastWCast = 0;
 
         public static bool test = false;
 
@@ -227,7 +227,9 @@ namespace ZedSharp {
                 
                 PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
                 Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position) * E.Range;
-                if (W.IsReady() && E.IsReady() && !getWshad) {
+                if(Environment.TickCount - LastWCast < 300)return;
+                LastWCast = Environment.TickCount;
+                if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad) {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
                     W.Cast(shadowPos);
                     Console.WriteLine("Cast WWW cmnn");
