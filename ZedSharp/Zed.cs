@@ -261,8 +261,7 @@ namespace ZedSharp {
             }
 
             if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
-                Player.Distance(target) <= E.Range) )
-            {
+                Player.Distance(target) <= E.Range) {
                 E.Cast(true);
             }
 
