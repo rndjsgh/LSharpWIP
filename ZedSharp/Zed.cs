@@ -100,11 +100,12 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
             if (Environment.TickCount - LastWCast < 300) return;
+            LastWCast = Environment.TickCount;
+
 
             if (W.IsReady() && target.Distance(Player) < W.Range && shadowW == null && !getWshad) {
-                if (ZedSharp.menu.Item("useWC").GetValue<bool>()) {
+                if (ZedSharp.menu.Item("useWC").GetValue<bool>() && Q.IsReady() || E.IsReady()) {
                     W.Cast(target.Position, true);
-                    LastWCast = Environment.TickCount;
                 }
 
                 if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W") &&
@@ -125,8 +126,8 @@ namespace ZedSharp {
                     }
                 }
                 else {
-                    if (target.Distance(Player) <= Q.Range &&
-                        Q.GetPrediction(target, true).Hitchance >= HitChance.Medium && Q.IsReady()) {
+                    if (Player.Distance(target) <=850 &&
+                        Q.GetPrediction(target, true).Hitchance >= HitChance.High && Q.IsReady()) {
                         Q.Cast(target, true, true);
                     }
                 }
@@ -150,7 +151,7 @@ namespace ZedSharp {
             //var target =
             //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
             if (target == null || !canDoCombo(new[] {SpellSlot.Q, SpellSlot.E, SpellSlot.R})) return;
-            if (W.IsReady() && canGoToShadow("W") && shadowW != null) {
+            if (canGoToShadow("W") && shadowW != null) {
                 W.Cast();
             }
             ;
@@ -172,14 +173,13 @@ namespace ZedSharp {
             }
         }
 
-        public static void doLaneCombo(Obj_AI_Base target) { //TODO find out why the fuck W only casts SOMETIMES... it doesn't cast twice anymore but only casts sometimes.
-            // TODO kinda works Sometime :^)
+        public static void doLaneCombo(Obj_AI_Base target) {
             try {
-                /*if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
+                if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
                     isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
                     shadowCoax((Obj_AI_Hero) target);
                     return;
-                }*/
+                }
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
@@ -266,10 +266,10 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
             if (Environment.TickCount - LastWCast < 300) return;
+            LastWCast = Environment.TickCount;
             if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad &&
                 ZedSharp.menu.Item("useWH").GetValue<bool>()) {
                 W.Cast(target.Position, true);
-                LastWCast = Environment.TickCount;
             }
 
             if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
@@ -334,6 +334,20 @@ namespace ZedSharp {
                     if (E.IsReady() && minion.Distance(Player) <= E.Range) {
                         E.Cast(true);
                     }
+                }
+            }
+        }
+
+        public static void doLaneClear() {
+            List<Obj_AI_Base> allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+            if (ZedSharp.menu.Item("useQLC").GetValue<bool>()) {
+                MinionManager.FarmLocation bestLocation = Q.GetLineFarmLocation(allMinions.ToList(), Q.Width);
+                Q.Cast(bestLocation.Position);
+            }
+            if (ZedSharp.menu.Item("useELC").GetValue<bool>()) {
+                MinionManager.FarmLocation bestLocation = E.GetCircularFarmLocation(allMinions.ToList(), E.Width);
+                if (Player.Distance(bestLocation.Position) <= E.Range) {
+                    E.Cast(true);
                 }
             }
         }

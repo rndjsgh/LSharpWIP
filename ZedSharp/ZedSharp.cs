@@ -76,8 +76,8 @@ namespace ZedSharp {
             menu.SubMenu("harass").AddItem(new MenuItem("useEH", "Use E in harass").SetValue(false));
 
             menu.AddSubMenu(new Menu("Laneclear", "laneclear"));
-            menu.SubMenu("laneclear").AddItem(new MenuItem("useQLC", "Use Q to lasthit").SetValue(false));
-            menu.SubMenu("laneclear").AddItem(new MenuItem("useELC", "Use E to lasthit").SetValue(false));
+            menu.SubMenu("laneclear").AddItem(new MenuItem("useQLC", "Use Q to laneclear").SetValue(false));
+            menu.SubMenu("laneclear").AddItem(new MenuItem("useELC", "Use E to laneclear").SetValue(false));
 
             menu.AddSubMenu(new Menu("Lasthit", "lasthit"));
             menu.SubMenu("lasthit").AddItem(new MenuItem("useQLH", "Use Q to lasthit").SetValue(false));
@@ -126,13 +126,9 @@ namespace ZedSharp {
             }
         }
 
-        private static void OnGameProcessPacket(GamePacketEventArgs args) {
-            
-        }
+        private static void OnGameProcessPacket(GamePacketEventArgs args) {}
 
-        private static void OnGameSendPacket(GamePacketEventArgs args) {
-            
-        }
+        private static void OnGameSendPacket(GamePacketEventArgs args) {}
 
         private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args) {
             // if (!sender.IsMe) return;
@@ -207,13 +203,16 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
-                    if (Zed.R.IsReady())
+                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range)
                         Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
                     break;
                 case LXOrbwalker.Mode.Harass:
                     Zed.doHarass();
+                    break;
+                case LXOrbwalker.Mode.LaneClear:
+                    Zed.doLaneClear();
                     break;
                 case LXOrbwalker.Mode.Lasthit:
                     Zed.doLastHit();
