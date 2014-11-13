@@ -99,8 +99,6 @@ namespace ZedSharp {
         public static void normalCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
-            if (Environment.TickCount - LastWCast < 300) return;
-            LastWCast = Environment.TickCount;
             if (W.IsReady() && target.Distance(Player) < W.Range && shadowW == null && !getWshad) {
                 if (ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                     W.Cast(target.Position, true);
@@ -118,7 +116,8 @@ namespace ZedSharp {
                     Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
                     if (Q.IsReady()) {
                         if (target.Distance(shadowW) <= Q.Range) {
-                            Q.Cast(target, true, true);
+                            if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
+                                Q.Cast(target, true, true);
                         }
                     }
                 }
@@ -198,7 +197,7 @@ namespace ZedSharp {
                 LastWCast = Environment.TickCount;
                 if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad) {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
-                    W.Cast(shadowPos);
+                    W.Cast(shadowPos, true);
                     Console.WriteLine("Cast WWW cmnn");
                 }
                 if (E.IsReady() && shadowW != null || shadowR != null) {
@@ -263,11 +262,9 @@ namespace ZedSharp {
         public static void doHarass() {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
-            if (Environment.TickCount - LastWCast < 300) return;
             if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad &&
                 ZedSharp.menu.Item("useWH").GetValue<bool>()) {
                 W.Cast(target.Position, true);
-                LastWCast = Environment.TickCount;
             }
 
             if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
