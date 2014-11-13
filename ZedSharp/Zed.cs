@@ -35,11 +35,11 @@ namespace ZedSharp {
         public static Spell R = new Spell(SpellSlot.R, 600);
 
         public static Obj_AI_Minion shadowW;
-        public static bool getRshad = false;
-        public static bool getWshad = false;
+        public static bool getRshad;
+        public static bool getWshad;
         public static Obj_AI_Minion shadowR;
         public static HitChance CustomHitChance = HitChance.Medium;
-
+        public static float LastWCast;
 
         public static bool test = false;
 
@@ -72,7 +72,7 @@ namespace ZedSharp {
             return dmg;
         }
 
-        public static bool canGoToShadow(string type) {
+        private static bool canGoToShadow(string type) {
             // TODO Shadow param W or R
             if (type == "W") {
                 if (ZedSharp.W2)
@@ -88,142 +88,89 @@ namespace ZedSharp {
         public static void normalCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
 
-            if (Q.IsReady() && ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && !canGoToShadow("W")) {
-                    W.Cast(target.Position, true);
-                    ZedSharp.W2 = true;
-                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.High) {
-                        Q.Cast(target, true, true);
-                    }
-                    if (E.IsReady() && shadowW.Distance(target) <= E.Range || Player.Distance(target) <= E.Range) {
-                        E.Cast(true);
-                    }
-                }
-                else {
-                    if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
-                        Q.Cast(target, true, true); // Normal 
-                    }
+            if (Environment.TickCount - LastWCast < 300) return;
+            LastWCast = Environment.TickCount;
+            if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad) {
+                W.Cast(target.Position, true);
 
-                    if (E.IsReady() && Player.Distance(target) <= E.Range) {
-                        E.Cast(true);
-                    }
+                if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W")) {
+                    if (target.Distance(shadowW) < Q.Range + 600)
+                        // if target is lower then Q range + flash range = 600?!?? then follow W.
+                        W.Cast(true);
                 }
             }
+
+            if (E.IsReady() && target.Distance(shadowW) <= E.Range || Player.Distance(target) <= E.Range) {
+                E.Cast(true);
+            }
+
+            Utility.DelayAction.Add(100, castQ);
         }
 
-        public static void doCombo() {
-            //Combo goes here
-            if (!canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) return;
-            Obj_AI_Hero target = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Physical);
+        private static bool isKillableShadowCoax(Obj_AI_Hero target) {
+            float health = target.Health;
+            int igniteDMG = 50 + 20*Player.Level;
+            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG >=
+                   health;
+        }
+
+        private static void shadowCoax(Obj_AI_Hero target) {
+            //var target =
+            //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
+            if (target == null || !canDoCombo(new[] {SpellSlot.Q, SpellSlot.E, SpellSlot.R})) return;
+            if (W.IsReady() && canGoToShadow("W") && shadowW != null) {
+                W.Cast();
+            }
+            ;
+            if (R.IsReady() && shadowR == null) {
+                R.Cast(target);
+            }
+            if (E.IsReady() && shadowR != null) {
+                E.Cast();
+            }
+
+            if (Q.IsReady() && shadowR != null) {
+                Q.Cast(target, true);
+            }
             LXOrbwalker.ForcedTarget = target;
-            int Shuriken = ZedSharp.menu.Item("minQ").GetValue<Slider>().Value;
-            int minE = ZedSharp.menu.Item("minE").GetValue<Slider>().Value;
-            Vector3 ShadowPos = shadowR != null ? shadowR.Position : Vector3.Zero;
-            if (R.IsReady() && !canGoToShadow("R")) {
-                ShadowPos = Player.ServerPosition;
-                R.Cast(target, true);
+            if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+            sumItems.castIgnite(target);
+            if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
+                R.Cast();
             }
-            //Fix
-            Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*W.Range;
-            if (!canGoToShadow("W") && W.IsReady() && Player.Distance(target) <= 300) {
-                Game.PrintChat("W2 " + ZedSharp.W2);
-                W.Cast(new Vector3(shadowPos.X, shadowPos.Y, target.ServerPosition.Z));
-                ZedSharp.W2 = true;
-                Game.PrintChat("W2 Now: " + ZedSharp.W2);
-            }
-            PredictionOutput QPrediction = Q.GetPrediction(target);
-            PredictionOutput CustomQPredictionW = Prediction.GetPrediction(new PredictionInput {
-                Unit = target,
-                Delay = Q.Delay,
-                Radius = Q.Width,
-                From = shadowW.Position, //We check for prediction in advance
-                Range = Q.Range,
-                Collision = false,
-                Type = Q.Type,
-                RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                Aoe = false
-            });
-            PredictionOutput CustomQPredictionR = Prediction.GetPrediction(new PredictionInput {
-                Unit = target,
-                Delay = Q.Delay,
-                Radius = Q.Width,
-                From = shadowR.Position, //We check for prediction in advance
-                Range = Q.Range,
-                Collision = false,
-                Type = Q.Type,
-                RangeCheckFrom = ObjectManager.Player.ServerPosition,
-                Aoe = false
-            });
-
-            #region QCasting
-
-            if ((QPrediction.Hitchance >= CustomHitChance && CustomQPredictionR.Hitchance >= CustomHitChance &&
-                 CustomQPredictionW.Hitchance >= CustomHitChance)) //Triple Q!
-            {
-                Q.Cast(QPrediction.CastPosition, true);
-            }
-            else if (((QPrediction.Hitchance >= CustomHitChance && CustomQPredictionR.Hitchance >= CustomHitChance)
-                      || (QPrediction.Hitchance >= CustomHitChance && CustomQPredictionW.Hitchance >= CustomHitChance)) &&
-                     Shuriken < 3) //Q-R / q-W Prediction
-            {
-                Q.Cast(QPrediction.CastPosition, true);
-            }
-            else if ((CustomQPredictionW.Hitchance >= CustomHitChance && CustomQPredictionR.Hitchance >= CustomHitChance) &&
-                     Shuriken < 3) //R-W Prediction
-            {
-                Q.Cast(CustomQPredictionR.CastPosition, true);
-            }
-            else {
-                if (CustomQPredictionR.Hitchance >= CustomHitChance && Shuriken < 2)
-                    Q.Cast(CustomQPredictionR.CastPosition, true);
-                if (CustomQPredictionW.Hitchance >= CustomHitChance && Shuriken < 2)
-                    Q.Cast(CustomQPredictionW.CastPosition, true);
-                if (QPrediction.Hitchance >= CustomHitChance && Shuriken < 2)
-                    Q.Cast(QPrediction.CastPosition, true);
-            }
-
-            #endregion
-
-            #region ECasting
-
-            if (target.Distance(shadowR.Position) <= E.Range && target.Distance(shadowW.Position) <= E.Range &&
-                //Triple E
-                target.Distance(Player.Position) <= E.Range) {
-                E.Cast(true);
-            }
-            else if ((target.Distance(shadowR.Position) <= E.Range && target.Distance(shadowW.Position) <= E.Range
-                //Double E
-                      || target.Distance(Player.Position) <= E.Range && target.Distance(shadowW.Position) <= E.Range
-                      || target.Distance(Player.Position) <= E.Range && target.Distance(shadowR.Position) <= E.Range)
-                     && minE < 3) {
-                E.Cast(true);
-            }
-            else {
-                if (target.Distance(shadowR.Position) <= E.Range && minE < 2) //Single E
-                    E.Cast(true);
-                if (target.Distance(shadowW.Position) <= E.Range && minE < 2)
-                    E.Cast(true);
-                if (target.Distance(Player.Position) <= E.Range && minE < 2)
-                    E.Cast(true);
-            }
-
-            #endregion
         }
-
 
         public static void doLaneCombo(Obj_AI_Base target) {
             // TODO kinda works Sometime :^)
             try {
-                float dist = target.Distance(Player);
+                if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
+                    isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
+                    shadowCoax((Obj_AI_Hero) target);
+                    return;
+                }
+                //Tried to Add shadow Coax
+                float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
                     canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
                     R.Cast(target);
                 }
                 //eather casts 2 times or 0 get it to cast 1 time TODO
+                // Game.PrintChat("W2 "+ZedSharp.W2);
+
+                foreach (
+                    Obj_AI_Hero newtarget in
+                        ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
+                            enemy => enemy.HasBuff("zedulttargetmark"))) {
+                    target = newtarget;
+                }
+
+                //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
+                Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
+                if (Environment.TickCount - LastWCast < 300) return;
+                LastWCast = Environment.TickCount;
                 if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad) {
-                    PredictionOutput po = Prediction.GetPrediction(target, 0.350f);
-                    W.Cast(V2E(shadowR.Position, po.UnitPosition, E.Range));
-                    ZedSharp.W2 = true;
+                    //V2E(shadowR.Position, po.UnitPosition, E.Range)
+                    W.Cast(shadowPos);
                     Console.WriteLine("Cast WWW cmnn");
                 }
 
@@ -248,7 +195,7 @@ namespace ZedSharp {
                 }
             }
             catch (Exception ex) {
-                Console.WriteLine(ex);
+                //Console.WriteLine(ex);
             }
         }
 
@@ -288,27 +235,6 @@ namespace ZedSharp {
             return Player.Mana >= totalCost;
         }
 
-        public static Vector3 getOptimalShadowPlacement(Vector3 TargetPos) {
-            float LastShadowDist = float.MaxValue;
-            Vector3 LastVec = Vector3.Zero;
-            for (float r = W.Range; r >= 65; r -= 100) {
-                double RadAngle = 2*Math.PI*r/100;
-                for (int i = 0; i < RadAngle; i++) {
-                    double RadAngle2 = i*2*Math.PI/RadAngle;
-                    var cos = (float) Math.Cos(RadAngle2);
-                    var sin = (float) Math.Cos(RadAngle2);
-                    var PossiblePoint = new Vector3(Player.Position.X + r*cos, Player.Position.Y + r*sin,
-                        Player.Position.Z);
-                    if (!Utility.IsWall(PossiblePoint) && TargetPos.Distance(PossiblePoint) < LastShadowDist) {
-                        LastShadowDist = TargetPos.Distance(PossiblePoint);
-                        LastVec = PossiblePoint;
-                    }
-                }
-            }
-            return LastVec;
-        }
-
-
         public static void doHarass() {
             Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
 
@@ -334,7 +260,7 @@ namespace ZedSharp {
 
             Q.UpdateSourcePosition(Player.Position, Player.Position);
 
-            if (shadowW != null) {
+            if (shadowW != null && getWshad) {
                 Q.UpdateSourcePosition(shadowW.Position, shadowW.Position);
                 Q.Cast(target, true, true);
                 Q.UpdateSourcePosition(Player.Position, Player.Position);
@@ -366,7 +292,7 @@ namespace ZedSharp {
             if (!ZedSharp.menu.Item("SafeRBack").GetValue<bool>()) return true;
             //Idk if 500 is ok, maybe we can increment it a little bit more
             int enemiesShadow = shadow.Position.CountEnemysInRange(500);
-            int enemiesPlayer = ObjectManager.Player.Position.CountEnemysInRange(500);
+            int enemiesPlayer = Player.Position.CountEnemysInRange(500);
             if (enemiesShadow < enemiesPlayer)
                 return true;
             return false;
