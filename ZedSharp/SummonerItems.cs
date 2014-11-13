@@ -8,7 +8,7 @@ namespace ZedSharp {
     class SummonerItems {
         private Obj_AI_Hero player;
         private Spellbook sumBook;
-        private SpellSlot ignite;
+        public  SpellSlot ignite;
         private SpellSlot smite;
 
 
