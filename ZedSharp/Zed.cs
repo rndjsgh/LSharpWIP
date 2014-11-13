@@ -99,9 +99,12 @@ namespace ZedSharp {
         public static void normalCombo() {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
+            if (Environment.TickCount - LastWCast < 300) return;
+
             if (W.IsReady() && target.Distance(Player) < W.Range && shadowW == null && !getWshad) {
                 if (ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                     W.Cast(target.Position, true);
+                    LastWCast = Environment.TickCount;
                 }
 
                 if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W") &&
@@ -169,7 +172,7 @@ namespace ZedSharp {
             }
         }
 
-        public static void doLaneCombo(Obj_AI_Base target) {
+        public static void doLaneCombo(Obj_AI_Base target) { //TODO find out why the fuck W only casts SOMETIMES... it doesn't cast twice anymore but only casts sometimes.
             // TODO kinda works Sometime :^)
             try {
                 /*if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
@@ -195,7 +198,7 @@ namespace ZedSharp {
                 Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
                 if (Environment.TickCount - LastWCast < 300) return;
                 LastWCast = Environment.TickCount;
-                if (W.IsReady() && E.IsReady() && shadowW == null && !getWshad) {
+                if (W.IsReady() && shadowW == null && !getWshad) {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
                     W.Cast(shadowPos, true);
                     Console.WriteLine("Cast WWW cmnn");
@@ -262,9 +265,11 @@ namespace ZedSharp {
         public static void doHarass() {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
+            if (Environment.TickCount - LastWCast < 300) return;
             if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad &&
                 ZedSharp.menu.Item("useWH").GetValue<bool>()) {
                 W.Cast(target.Position, true);
+                LastWCast = Environment.TickCount;
             }
 
             if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
