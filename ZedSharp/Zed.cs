@@ -113,15 +113,27 @@ namespace ZedSharp {
                 }
             }
 
-            if (ZedSharp.menu.Item("useQC").GetValue<bool>())
-                if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
-                    Q.Cast(target, true, true);
+            if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
+                if (shadowW == null && !getWshad) {
+                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium &&
+                        Player.Distance(target) <= Q.Range) {
+                        Q.Cast(target, true, true);
+                    }
+                }
+                if (shadowW != null && getWshad) {
+                    if (target.Distance(Player) <= Q.Range || target.Distance(shadowW) <= Q.Range) {
+                        if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium) {
+                            Q.Cast(target, true, true);
+                        }
+                    }
+                }
+            }
+
 
             if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
                 Player.Distance(target) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
                 E.Cast(true);
             }
-
         }
 
         private static bool isKillableShadowCoax(Obj_AI_Hero target) {
@@ -267,9 +279,21 @@ namespace ZedSharp {
                 E.Cast(true);
             }
 
-            if (ZedSharp.menu.Item("useQH").GetValue<bool>())
-                if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium)
-                    Q.Cast(target, true, true);
+            if (ZedSharp.menu.Item("useQH").GetValue<bool>()) {
+                if (shadowW == null && !getWshad) {
+                    if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium &&
+                        Player.Distance(target) <= Q.Range) {
+                        Q.Cast(target, true, true);
+                    }
+                }
+                if (shadowW != null && getWshad) {
+                    if (target.Distance(Player) <= Q.Range || target.Distance(shadowW) <= Q.Range) {
+                        if (Q.GetPrediction(target, true).Hitchance >= HitChance.Medium) {
+                            Q.Cast(target, true, true);
+                        }
+                    }
+                }
+            }
         }
 
         public static void checkForSwap(string mode) {
