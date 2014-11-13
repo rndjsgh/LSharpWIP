@@ -38,7 +38,7 @@ namespace ZedSharp {
         public static bool getRshad;
         public static bool getWshad;
         public static Obj_AI_Minion shadowR;
-        public static HitChance CustomHitChance = HitChance.Medium;
+        public const HitChance customHitchance = HitChance.Medium;
         public static float LastWCast;
 
         public static bool test = false;
@@ -56,6 +56,7 @@ namespace ZedSharp {
             float dist = Player.Distance(po.UnitPosition);
             float gapDist = ((W.IsReady()) ? W.Range : 0);
             float distAfterGap = dist - gapDist;
+
             if (distAfterGap < Player.AttackRange)
                 dmg += (float) Player.GetAutoAttackDamage(target);
             if (Q.IsReady() && distAfterGap < Q.Range)
@@ -68,6 +69,14 @@ namespace ZedSharp {
                 dmg += R.GetDamage(target);
                 dmg += (float) Player.CalcDamage(target, Damage.DamageType.Physical, (dmg*(5 + 15*R.Level)/100));
             }
+            if (Items.HasItem(3153)) // botrk
+                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Botrk);
+            if (Items.HasItem(3074))
+                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Hydra);
+            if (Items.HasItem(3077))
+                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Tiamat);
+            if (Items.HasItem(3144))
+                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Bilgewater);
 
             return dmg;
         }
@@ -154,7 +163,7 @@ namespace ZedSharp {
                     canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
                     R.Cast(target);
                 }
-                //eather casts 2 times or 0 get it to cast 1 time TODO
+                //eather casts 2 times or 0 get it to cast 1 time TODO fixed
                 // Game.PrintChat("W2 "+ZedSharp.W2);
 
                 foreach (
@@ -195,7 +204,7 @@ namespace ZedSharp {
                 }
             }
             catch (Exception ex) {
-                //Console.WriteLine(ex);
+                Console.WriteLine(ex);
             }
         }
 
@@ -266,7 +275,7 @@ namespace ZedSharp {
                 Q.UpdateSourcePosition(Player.Position, Player.Position);
                 Q.Cast(target, true, true);
             }
-            else if (Q.GetPrediction(target, true).Hitchance >= CustomHitChance) {
+            else if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
                 Q.Cast(target, true, true);
             }
         }
