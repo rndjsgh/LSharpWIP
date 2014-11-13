@@ -102,8 +102,9 @@ namespace ZedSharp {
             if (Environment.TickCount - LastWCast < 300) return;
             LastWCast = Environment.TickCount;
             if (W.IsReady() && target.Distance(Player) < W.Range && shadowW == null && !getWshad) {
-                if (ZedSharp.menu.Item("useWC").GetValue<bool>())
+                if (ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                     W.Cast(target.Position, true);
+                }
 
                 if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W") &&
                     ZedSharp.menu.Item("useWC").GetValue<bool>()) {
@@ -172,27 +173,25 @@ namespace ZedSharp {
         public static void doLaneCombo(Obj_AI_Base target) {
             // TODO kinda works Sometime :^)
             try {
-                //  if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
-                //     isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
-                //      shadowCoax((Obj_AI_Hero) target);
-                //      return;
-                // }
+                /*if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
+                    isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
+                    shadowCoax((Obj_AI_Hero) target);
+                    return;
+                }*/
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
                     canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
                     R.Cast(target);
                 }
-                //eather casts 2 times or 0 get it to cast 1 time TODO fixed
+                //eather casts 2 times or 0 get it to cast 1 time TODO
                 // Game.PrintChat("W2 "+ZedSharp.W2);
-
-                //  foreach (
-                //       Obj_AI_Hero newtarget in
-                //          ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
-                //              enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
-                //       target = newtarget;
-                //   }
-
+                /*foreach (
+                    Obj_AI_Hero newtarget in
+                        ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
+                            enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
+                    target = newtarget;
+                }*/
                 //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
                 Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
                 if (Environment.TickCount - LastWCast < 300) return;
@@ -202,11 +201,9 @@ namespace ZedSharp {
                     W.Cast(shadowPos);
                     Console.WriteLine("Cast WWW cmnn");
                 }
-
                 if (E.IsReady() && shadowW != null || shadowR != null) {
                     E.Cast();
                 }
-
                 if (Q.IsReady() && shadowW != null && shadowR != null) {
                     float midDist = dist;
                     midDist += target.Distance(shadowR);
@@ -218,13 +215,12 @@ namespace ZedSharp {
                         Q.Cast(po.UnitPosition);
                     }
                 }
-
                 if (shadowR != null) {
                     castItemsFull(target);
                 }
             }
             catch (Exception ex) {
-                Console.WriteLine(ex);
+                //Console.WriteLine(ex);
             }
         }
 
@@ -268,10 +264,10 @@ namespace ZedSharp {
             Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
 
             if (Environment.TickCount - LastWCast < 300) return;
-            LastWCast = Environment.TickCount;
             if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad &&
                 ZedSharp.menu.Item("useWH").GetValue<bool>()) {
                 W.Cast(target.Position, true);
+                LastWCast = Environment.TickCount;
             }
 
             if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
@@ -295,7 +291,6 @@ namespace ZedSharp {
                     }
                 }
             }
-
         }
 
         public static void checkForSwap(string mode) {
