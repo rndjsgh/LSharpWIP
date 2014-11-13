@@ -172,11 +172,11 @@ namespace ZedSharp {
         public static void doLaneCombo(Obj_AI_Base target) {
             // TODO kinda works Sometime :^)
             try {
-                if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
-                    isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
-                    shadowCoax((Obj_AI_Hero) target);
-                    return;
-                }
+              //  if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
+               //     isKillableShadowCoax((Obj_AI_Hero) target) && target.Distance(shadowW.Position) <= R.Range) {
+              //      shadowCoax((Obj_AI_Hero) target);
+              //      return;
+               // }
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
@@ -186,12 +186,12 @@ namespace ZedSharp {
                 //eather casts 2 times or 0 get it to cast 1 time TODO fixed
                 // Game.PrintChat("W2 "+ZedSharp.W2);
 
-                foreach (
-                    Obj_AI_Hero newtarget in
-                        ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
-                            enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
-                    target = newtarget;
-                }
+              //  foreach (
+             //       Obj_AI_Hero newtarget in
+              //          ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
+              //              enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
+             //       target = newtarget;
+             //   }
 
                 //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
                 Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
