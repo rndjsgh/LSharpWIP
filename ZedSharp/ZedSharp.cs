@@ -75,6 +75,13 @@ namespace ZedSharp {
             menu.SubMenu("harass").AddItem(new MenuItem("useWH", "Use W in harass").SetValue(false));
             menu.SubMenu("harass").AddItem(new MenuItem("useEH", "Use E in harass").SetValue(false));
 
+            menu.AddSubMenu(new Menu("Laneclear", "laneclear"));
+            menu.SubMenu("laneclear").AddItem(new MenuItem("temp", "Not Supported ATM"));
+
+            menu.AddSubMenu(new Menu("Lasthit", "lasthit"));
+            menu.SubMenu("lasthit").AddItem(new MenuItem("useQLH", "Use Q to lasthit").SetValue(false));
+            menu.SubMenu("lasthit").AddItem(new MenuItem("useELH", "Use E to lasthit").SetValue(false));
+
             menu.AddSubMenu(new Menu("Use ultimate on", "ultOn"));
             HeroMenuCreate();
 
@@ -107,7 +114,7 @@ namespace ZedSharp {
                 GameObject.OnCreate += OnCreateObject;
                 GameObject.OnDelete += OnDeleteObject;
                 Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
-                
+
                 Game.OnGameSendPacket += OnGameSendPacket;
                 Game.OnGameProcessPacket += OnGameProcessPacket;
 
@@ -122,9 +129,8 @@ namespace ZedSharp {
 
         private static void OnGameSendPacket(GamePacketEventArgs args) {}
 
-        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-           // if (!sender.IsMe) return;
+        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args) {
+            // if (!sender.IsMe) return;
             //if (args.SData.Name == "ZedShadowDash") Zed.getWshad = true;
             //Game.PrintChat(args.SData.Name);
         }
@@ -144,19 +150,15 @@ namespace ZedSharp {
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
-            if (sender is Obj_AI_Minion)
-            {
+            if (sender is Obj_AI_Minion) {
                 var min = sender as Obj_AI_Minion;
-                if (min.IsAlly && min.BaseSkinName == "ZedShadow")
-                {
-                    if (Zed.getRshad)
-                    {
-                       // Game.PrintChat("R Create");
+                if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
+                    if (Zed.getRshad) {
+                        // Game.PrintChat("R Create");
                         Zed.shadowR = min;
                         Zed.getRshad = false;
                     }
-                    if(Zed.getWshad)
-                    {
+                    if (Zed.getWshad) {
                         //Game.PrintChat("W Created");
                         Zed.shadowW = min;
                         Zed.getWshad = false;
@@ -164,15 +166,13 @@ namespace ZedSharp {
                 }
             }
 
-            var spell = (Obj_SpellMissile)sender;
+            var spell = (Obj_SpellMissile) sender;
 
             Obj_AI_Base unit = spell.SpellCaster;
             string name = spell.SData.Name;
             // Game.PrintChat(name);
-            if (unit.IsMe)
-            {
-                switch (name)
-                {
+            if (unit.IsMe) {
+                switch (name) {
                     case "ZedUltMissile":
                         Zed.getRshad = true;
                         R2 = true;
@@ -185,7 +185,6 @@ namespace ZedSharp {
                 }
             }
 
-            
 
             if (sender.Name == "Zed_Base_R_buf_tell.troy" && sender.IsEnemy) {
                 //TODO check if this works it means the enemy is killable with ult and you can then leave him and return to ult shadow if it is still active.
@@ -193,33 +192,26 @@ namespace ZedSharp {
                 Zed.checkForSwap("OnKill");
             }
 
-            
+
             //"Zed_Base_R_buf_tell.troy" = killable
         }
 
         private static void OnGameUpdate(EventArgs args) {
-            //  Game.PrintChat(Zed.canGoToShadow("W").ToString());
-           // if (Zed.shadowW != null)
-           // {
-            //    W2 = true;
-          //  }
-           // else
-           // {
-           //     W2 = false;
-           // }
             Zed.checkForSwap("LowHP");
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady())
-                        // Utility.DelayAction.Add(310,() => Zed.doLaneCombo(target));
                         Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
                     break;
                 case LXOrbwalker.Mode.Harass:
                     Zed.doHarass();
+                    break;
+                case LXOrbwalker.Mode.Lasthit:
+                    Zed.doLastHit();
                     break;
             }
         }
@@ -238,7 +230,7 @@ namespace ZedSharp {
         }
 
         private static void onDraw(EventArgs args) {
-            Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy).FirstOrDefault();
+            Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
             Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
             Utility.DrawCircle(shadowPos, 100, Color.Yellow);
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)

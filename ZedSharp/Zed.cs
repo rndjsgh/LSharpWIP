@@ -17,7 +17,10 @@ namespace ZedSharp {
             WEaaKill = 6,
             Qkill = 7,
             Ekill = 8,
-        } //Easiest
+        }
+
+        public const HitChance customHitchance = HitChance.Medium;
+        //Easiest
 
         public static Obj_AI_Hero Player = ObjectManager.Player;
 
@@ -38,7 +41,6 @@ namespace ZedSharp {
         public static bool getRshad;
         public static bool getWshad;
         public static Obj_AI_Minion shadowR;
-        public const HitChance customHitchance = HitChance.Medium;
         public static float LastWCast;
 
         public static bool test = false;
@@ -70,13 +72,13 @@ namespace ZedSharp {
                 dmg += (float) Player.CalcDamage(target, Damage.DamageType.Physical, (dmg*(5 + 15*R.Level)/100));
             }
             if (Items.HasItem(3153)) // botrk
-                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Botrk);
+                dmg += (float) Player.GetItemDamage(target, Damage.DamageItems.Botrk);
             if (Items.HasItem(3074))
-                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Hydra);
+                dmg += (float) Player.GetItemDamage(target, Damage.DamageItems.Hydra);
             if (Items.HasItem(3077))
-                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Tiamat);
+                dmg += (float) Player.GetItemDamage(target, Damage.DamageItems.Tiamat);
             if (Items.HasItem(3144))
-                dmg += (float)Player.GetItemDamage(target, Damage.DamageItems.Bilgewater);
+                dmg += (float) Player.GetItemDamage(target, Damage.DamageItems.Bilgewater);
 
             return dmg;
         }
@@ -100,20 +102,24 @@ namespace ZedSharp {
             if (Environment.TickCount - LastWCast < 300) return;
             LastWCast = Environment.TickCount;
             if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad) {
-                W.Cast(target.Position, true);
+                if (ZedSharp.menu.Item("useWC").GetValue<bool>())
+                    W.Cast(target.Position, true);
 
-                if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W")) {
+                if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W") &&
+                    ZedSharp.menu.Item("useWC").GetValue<bool>()) {
                     if (target.Distance(shadowW) < Q.Range + 600)
                         // if target is lower then Q range + flash range = 600?!?? then follow W.
                         W.Cast(true);
                 }
             }
 
-            if (E.IsReady() && target.Distance(shadowW) <= E.Range || Player.Distance(target) <= E.Range) {
+            if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
+                Player.Distance(target) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
                 E.Cast(true);
             }
 
-            Utility.DelayAction.Add(100, castQ);
+            if (ZedSharp.menu.Item("useQC").GetValue<bool>())
+                Utility.DelayAction.Add(100, castQ);
         }
 
         private static bool isKillableShadowCoax(Obj_AI_Hero target) {
@@ -245,22 +251,23 @@ namespace ZedSharp {
         }
 
         public static void doHarass() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
+            Obj_AI_Hero target = SimpleTs.GetTarget(Q.Range + W.Range, SimpleTs.DamageType.Physical);
 
-            if (W.IsReady() && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
-                if (LastCastedSpell.LastCastPacketSent.Slot != SpellSlot.W) {
-                    W.Cast(target.Position, true);
-                    Utility.DelayAction.Add(100, castQ);
-                }
-            }
-            else {
-                castQ();
+            if (Environment.TickCount - LastWCast < 300) return;
+            LastWCast = Environment.TickCount;
+            if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad &&
+                ZedSharp.menu.Item("useWH").GetValue<bool>()) {
+                W.Cast(target.Position, true);
             }
 
-            if (E.IsReady() && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
-                if (target.Distance(Player) <= E.Range || target.Distance(shadowW) <= E.Range)
-                    E.Cast();
+            if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
+                Player.Distance(target) <= E.Range) )
+            {
+                E.Cast(true);
             }
+
+            if (ZedSharp.menu.Item("useQH").GetValue<bool>())
+                Utility.DelayAction.Add(100, castQ);
         }
 
         private static void castQ() {
@@ -305,6 +312,22 @@ namespace ZedSharp {
             if (enemiesShadow < enemiesPlayer)
                 return true;
             return false;
+        }
+
+        public static void doLastHit() {
+            List<Obj_AI_Base> allMinions = MinionManager.GetMinions(Player.Position, Q.Range);
+            foreach (Obj_AI_Base minion in allMinions) {
+                if (Q.GetDamage(minion) >= minion.Health && ZedSharp.menu.Item("useQLH").GetValue<bool>()) {
+                    if (Q.IsReady() && minion.Distance(Player) <= Q.Range) {
+                        Q.Cast(minion, true, true);
+                    }
+                }
+                if (E.GetDamage(minion) >= minion.Health && ZedSharp.menu.Item("useELH").GetValue<bool>()) {
+                    if (E.IsReady() && minion.Distance(Player) <= E.Range) {
+                        E.Cast(true);
+                    }
+                }
+            }
         }
     }
 }
