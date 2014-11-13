@@ -201,7 +201,6 @@ namespace ZedSharp {
                 if (W.IsReady() && shadowW == null && !getWshad) {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
                     W.Cast(shadowPos, true);
-                    Console.WriteLine("Cast WWW cmnn");
                 }
                 if (E.IsReady() && shadowW != null || shadowR != null) {
                     E.Cast();
