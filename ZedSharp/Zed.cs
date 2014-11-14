@@ -268,9 +268,11 @@ namespace ZedSharp {
             if (ListOfEnemies.Count > 0 && E.IsReady()) E.Cast(true);
         }
 
-        private static bool canDoCombo(IEnumerable<SpellSlot> sp) {
+        private static bool canDoCombo(IEnumerable<SpellSlot> sp)
+        {
+            float delay = sp.Sum(sp1 => Player.Spellbook.GetSpell(sp1).SData.SpellCastTime);//Hope it is correct
             float totalCost = sp.Sum(sp1 => Player.Spellbook.GetManaCost(sp1));
-            return Player.Mana >= totalCost;
+            return Player.Mana + delay * 5 >= totalCost;
         }
 
         public static void doHarass() {
