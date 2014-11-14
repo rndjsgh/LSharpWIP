@@ -240,7 +240,7 @@ namespace ZedSharp {
            // Utility.DrawCircle(shadowPos, 100, Color.Yellow);
             foreach (var Hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy && h.Distance(Zed.shadowW.Position)<=Zed.R.Range))
             {
-                if (Zed.isKillableShadowCoax(Hero))
+                if (Zed.isKillableShadowCoax(Hero) && Zed.R.IsReady())
                 {
                     var pScreen = Drawing.WorldToScreen(Hero.Position);
                     pScreen[0] -= 20;
