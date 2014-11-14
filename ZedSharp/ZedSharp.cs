@@ -67,6 +67,7 @@ namespace ZedSharp {
             menu.SubMenu("combo").AddItem(new MenuItem("useEC", "Use E in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useRC", "Use R in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useWF", "Use W to follow").SetValue(true));
+            menu.SubMenu("combo").AddItem(new MenuItem("shadowCoax", "Do Shadow Coax").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             //menu.SubMenu("combo").AddItem(new MenuItem("minQ", "Minimum Q to Hit").SetValue(new Slider(2, 1, 3)));
             //menu.SubMenu("combo").AddItem(new MenuItem("minE", "Minimum E to Hit").SetValue(new Slider(2, 1, 3)));
 
@@ -92,7 +93,7 @@ namespace ZedSharp {
             menu.AddSubMenu(new Menu("Misc Options", "misc"));
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true)); //dont need %
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
-            menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead - disabled"));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
             menu.SubMenu("misc").AddItem(
                 new MenuItem("Flee", "Flee Key").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
@@ -187,18 +188,12 @@ namespace ZedSharp {
             }
 
 
-            if (sender.Name == "Zed_Base_R_buf_tell.troy") {
-                //TODO check if this works it means the enemy is killable with ult and you can then leave him and return to ult shadow if it is still active.
-                //TODO targetKillable = true - alos check hp and if below % go back to RShadow?
-                Zed.checkForSwap("OnKill");
-            }
-
-
             //"Zed_Base_R_buf_tell.troy" = killable
         }
 
         private static void OnGameUpdate(EventArgs args) {
             Zed.checkForSwap("LowHP");
+
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             switch (LXOrbwalker.CurrentMode) {
