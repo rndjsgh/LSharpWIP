@@ -144,8 +144,9 @@ namespace ZedSharp {
         public static bool isKillableShadowCoax(Obj_AI_Hero target) {
             float health = target.Health;
             int igniteDMG = sumItems.isIgniteReady()?50 + 20*Player.Level:0;
-            
-            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG  >=
+            float botrkDmg = Items.HasItem(3153) && Items.CanUseItem(3153) ?target.MaxHealth*0.1f:0f;
+            float cutLassDmg;
+            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG +botrkDmg >=
                    health;
         }
 
@@ -174,6 +175,7 @@ namespace ZedSharp {
             LXOrbwalker.ForcedTarget = target;
             if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
             sumItems.castIgnite(target);
+            castItemsFull(target);
             if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
                 R.Cast();
             }
