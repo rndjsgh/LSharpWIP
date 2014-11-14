@@ -37,6 +37,10 @@ namespace ZedSharp {
                 sumBook.CastSpell(ignite, target);
         }
 
+        public bool isIgniteReady()
+        {
+            return (ignite != SpellSlot.Unknown && sumBook.CanUseSpell(ignite) == SpellState.Ready);
+        }
         public void castSmite(Obj_AI_Hero target) {
             if (smite != SpellSlot.Unknown && sumBook.CanUseSpell(smite) == SpellState.Ready)
                 sumBook.CastSpell(smite, target);

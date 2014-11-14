@@ -152,6 +152,13 @@ namespace ZedSharp {
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
+            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy"))
+            {
+                if (Zed.canGoToShadow("R"))
+                {
+                    Zed.R.Cast();
+                }
+            }
             if (sender is Obj_AI_Minion) {
                 var min = sender as Obj_AI_Minion;
                 if (min.IsAlly && min.BaseSkinName == "ZedShadow") {

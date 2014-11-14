@@ -143,8 +143,9 @@ namespace ZedSharp {
 
         public static bool isKillableShadowCoax(Obj_AI_Hero target) {
             float health = target.Health;
-            int igniteDMG = 50 + 20*Player.Level;
-            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG >=
+            int igniteDMG = sumItems.isIgniteReady()?50 + 20*Player.Level:0;
+            
+            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG  >=
                    health;
         }
 
