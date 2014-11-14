@@ -5,7 +5,8 @@ using LeagueSharp.Common;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace ZedSharp {
+namespace ZedSharp
+{
     //TODO idea, use EvadeSpellDatabase or .dll to have an option to use ultimate to dodge dangeruous spells like Grag ult when evade can't dodge, so it doesn't waste ur R ? 
     //TODO - reply here.
     //TODO - when hes played more we will finish this tbh, i doubt he can carry solo q anyway too team orientated..
@@ -22,7 +23,8 @@ namespace ZedSharp {
      * At comboing put shadow w at best position to escape over wall or stuff
      */
 
-    internal class ZedSharp {
+    internal class ZedSharp
+    {
         public const string CharName = "Zed";
 
         public static Menu menu;
@@ -31,26 +33,32 @@ namespace ZedSharp {
         public static bool W2;
         public static bool R2;
 
-        public ZedSharp() {
+        public ZedSharp()
+        {
             Console.WriteLine("Zed sharp starting...");
-            try {
+            try
+            {
                 // if (ObjectManager.Player.BaseSkinName != CharName)
                 //    return;
                 /* CallBAcks */
                 CustomEvents.Game.OnGameLoad += onLoad;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        private static void HeroMenuCreate() {
-            foreach (Obj_AI_Hero Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy)) {
+        private static void HeroMenuCreate()
+        {
+            foreach (Obj_AI_Hero Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            {
                 menu.SubMenu("ultOn").AddItem(new MenuItem("use" + Enemy.ChampionName, Enemy.ChampionName).SetValue(true));
             }
         }
 
-        private static void loadMenu() {
+        private static void loadMenu()
+        {
             menu = new Menu("Zed Sharp", "zedSharp", true);
 
             var targetSelector = new Menu("Target Selector", "Target Selector"); //TODO new target selector ofc.
@@ -104,8 +112,10 @@ namespace ZedSharp {
             Game.PrintChat("Zed by Iridium, DZ191 and DETUKS Loaded.");
         }
 
-        private static void onLoad(EventArgs args) {
-            try {
+        private static void onLoad(EventArgs args)
+        {
+            try
+            {
                 loadMenu();
                 menu.AddToMainMenu();
 
@@ -122,36 +132,42 @@ namespace ZedSharp {
 
                 Zed.setSkillshots();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        private static void OnGameProcessPacket(GamePacketEventArgs args) {}
+        private static void OnGameProcessPacket(GamePacketEventArgs args) { }
 
-        private static void OnGameSendPacket(GamePacketEventArgs args) {}
+        private static void OnGameSendPacket(GamePacketEventArgs args) { }
 
-        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args) {
+        private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
             // if (!sender.IsMe) return;
             //if (args.SData.Name == "ZedShadowDash") Zed.getWshad = true;
             //Game.PrintChat(args.SData.Name);
         }
 
-        private static void OnDeleteObject(GameObject sender, EventArgs args) {
-            if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId) {
+        private static void OnDeleteObject(GameObject sender, EventArgs args)
+        {
+            if (Zed.shadowR != null && sender.NetworkId == Zed.shadowR.NetworkId)
+            {
                 Zed.shadowR = null;
                 R2 = false;
                 Zed.getRshad = false;
             }
 
-            if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId) {
+            if (Zed.shadowW != null && sender.NetworkId == Zed.shadowW.NetworkId)
+            {
                 Zed.shadowW = null;
                 W2 = false;
                 Zed.getWshad = false;
             }
         }
 
-        private static void OnCreateObject(GameObject sender, EventArgs args) {
+        private static void OnCreateObject(GameObject sender, EventArgs args)
+        {
             if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) && menu.Item("SwapRKill").GetValue<bool>())
             {
                 if (Zed.canGoToShadow("R"))
@@ -159,15 +175,19 @@ namespace ZedSharp {
                     Zed.R.Cast();
                 }
             }
-            if (sender is Obj_AI_Minion) {
+            if (sender is Obj_AI_Minion)
+            {
                 var min = sender as Obj_AI_Minion;
-                if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
-                    if (Zed.getRshad) {
+                if (min.IsAlly && min.BaseSkinName == "ZedShadow")
+                {
+                    if (Zed.getRshad)
+                    {
                         // Game.PrintChat("R Create");
                         Zed.shadowR = min;
                         Zed.getRshad = false;
                     }
-                    if (Zed.getWshad) {
+                    if (Zed.getWshad)
+                    {
                         //Game.PrintChat("W Created");
                         Zed.shadowW = min;
                         Zed.getWshad = false;
@@ -175,13 +195,15 @@ namespace ZedSharp {
                 }
             }
 
-            var spell = (Obj_SpellMissile) sender;
+            var spell = (Obj_SpellMissile)sender;
 
             Obj_AI_Base unit = spell.SpellCaster;
             string name = spell.SData.Name;
             // Game.PrintChat(name);
-            if (unit.IsMe) {
-                switch (name) {
+            if (unit.IsMe)
+            {
+                switch (name)
+                {
                     case "ZedUltMissile":
                         Zed.getRshad = true;
                         R2 = true;
@@ -198,21 +220,23 @@ namespace ZedSharp {
             //"Zed_Base_R_buf_tell.troy" = killable
         }
 
-        private static void OnGameUpdate(EventArgs args) {
+        private static void OnGameUpdate(EventArgs args)
+        {
             Zed.checkForSwap("LowHP");
 
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             Obj_AI_Hero target2 = SimpleTs.GetTarget(Zed.R.Range + Zed.Q.Range, SimpleTs.DamageType.Physical);
-            
+
             if (menu.Item("shadowCoax").GetValue<KeyBind>().Active)
             {
                 //Game.PrintChat("Hello!");
                 Zed.shadowCoax(target2);
             }
-            switch (LXOrbwalker.CurrentMode) {
+            switch (LXOrbwalker.CurrentMode)
+            {
                 case LXOrbwalker.Mode.Combo:
-                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range && menu.Item("use"+target.ChampionName).GetValue<bool>())
+                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range && menu.Item("useRC").GetValue<bool>() && menu.Item("use" + target.ChampionName).GetValue<bool>())
                         Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
@@ -230,23 +254,27 @@ namespace ZedSharp {
         }
 
 
-        private static void OnEndScene(EventArgs args) {
-            if (menu.Item("drawHp").GetValue<bool>()) {
+        private static void OnEndScene(EventArgs args)
+        {
+            if (menu.Item("drawHp").GetValue<bool>())
+            {
                 foreach (
                     Obj_AI_Hero enemy in
                         ObjectManager.Get<Obj_AI_Hero>()
-                            .Where(ene => !ene.IsDead && ene.IsEnemy && ene.IsVisible)) {
+                            .Where(ene => !ene.IsDead && ene.IsEnemy && ene.IsVisible))
+                {
                     hpi.unit = enemy;
                     hpi.drawDmg(Zed.getFullComboDmg(enemy));
                 }
             }
         }
 
-        private static void onDraw(EventArgs args) {
-           // Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
-           // Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
-           // Utility.DrawCircle(shadowPos, 100, Color.Yellow);
-            foreach (var Hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy && h.Distance(Zed.shadowW.Position)<=Zed.R.Range))
+        private static void onDraw(EventArgs args)
+        {
+            // Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
+            // Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
+            // Utility.DrawCircle(shadowPos, 100, Color.Yellow);
+            foreach (var Hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy && h.Distance(Zed.shadowW.Position) <= Zed.R.Range))
             {
                 if (Zed.isKillableShadowCoax(Hero) && Zed.R.IsReady())
                 {
@@ -254,7 +282,7 @@ namespace ZedSharp {
                     pScreen[0] -= 20;
                     Drawing.DrawText(pScreen.X - 60, pScreen.Y, Color.Red, "Killable by Shadow Coax");
                     //Utility.DrawCircle(Hero.Position,100f,Color.Blue);
-                }   
+                }
             }
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Utility.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
