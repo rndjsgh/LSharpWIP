@@ -83,7 +83,7 @@ namespace ZedSharp {
             return dmg;
         }
 
-        private static bool canGoToShadow(string type) {
+        public static bool canGoToShadow(string type) {
             // TODO Shadow param W or R
             if (type == "W") {
                 if (ZedSharp.W2)
@@ -141,14 +141,18 @@ namespace ZedSharp {
             }
         }
 
-        private static bool isKillableShadowCoax(Obj_AI_Hero target) {
+        public static bool isKillableShadowCoax(Obj_AI_Hero target) {
             float health = target.Health;
             int igniteDMG = 50 + 20*Player.Level;
             return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG >=
                    health;
         }
 
-        private static void shadowCoax(Obj_AI_Hero target) {
+        public static void shadowCoax(Obj_AI_Hero target)
+        {
+            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+           // Game.PrintChat("Wut");
+            if (shadowW == null || !canGoToShadow("W") || !Zed.isKillableShadowCoax((Obj_AI_Hero) target)) return;
             //var target =
             //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
             if (target == null || !canDoCombo(new[] {SpellSlot.Q, SpellSlot.E, SpellSlot.R})) return;
@@ -183,6 +187,7 @@ namespace ZedSharp {
 
         public static void doLaneCombo(Obj_AI_Base target) {
             try {
+                
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&

@@ -196,6 +196,11 @@ namespace ZedSharp {
 
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
+            if (menu.Item("shadowCoax").GetValue<KeyBind>().Active)
+            {
+                //Game.PrintChat("Hello!");
+                Zed.shadowCoax(target);
+            }
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range)
