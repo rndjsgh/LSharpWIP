@@ -127,7 +127,7 @@ namespace ZedSharp {
                 }
                 else {
                     if (Player.Distance(target) <=850 &&
-                        Q.GetPrediction(target, true).Hitchance >= HitChance.High && Q.IsReady()) {
+                        Q.GetPrediction(target, true).Hitchance >= HitChance.Medium && Q.IsReady()) {
                         Q.Cast(target, true, true);
                     }
                 }
@@ -233,6 +233,7 @@ namespace ZedSharp {
             }
             if (target.Distance(Player) < 500) {
                 sumItems.cast(SummonerItems.ItemIds.BotRK, target);
+                sumItems.cast(SummonerItems.ItemIds.Cutlass, target);
             }
             if (target.Distance(Player.ServerPosition) < (400 + target.BoundingRadius - 20)) {
                 sumItems.cast(SummonerItems.ItemIds.Tiamat);
@@ -286,7 +287,7 @@ namespace ZedSharp {
                     }
                 }
                 else {
-                    if (target.Distance(Player) <= Q.Range &&
+                    if (Player.Distance(target) <= Q.Range &&
                         Q.GetPrediction(target, true).Hitchance >= HitChance.Medium && Q.IsReady()) {
                         Q.Cast(target, true, true);
                     }
