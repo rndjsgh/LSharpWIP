@@ -176,9 +176,9 @@ namespace ZedSharp {
             if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
             sumItems.castIgnite(target);
             castItemsFull(target);
-            if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
-                R.Cast();
-            }
+           // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
+           //     R.Cast();
+          //  }
         }
 
         public static void doShadowCoax(Obj_AI_Hero target) {
@@ -326,7 +326,7 @@ namespace ZedSharp {
             }
         }
 
-        private static bool isSafeSwap(Obj_AI_Minion shadow) {
+        public static bool isSafeSwap(Obj_AI_Minion shadow) {
             if (!ZedSharp.menu.Item("SafeRBack").GetValue<bool>()) return true;
             //Idk if 500 is ok, maybe we can increment it a little bit more
             int enemiesShadow = shadow.Position.CountEnemysInRange(500);

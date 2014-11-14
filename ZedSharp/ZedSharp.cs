@@ -93,7 +93,7 @@ namespace ZedSharp {
             menu.AddSubMenu(new Menu("Misc Options", "misc"));
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true)); //dont need %
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
-            menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead - disabled"));
+            menu.SubMenu("misc").AddItem(new MenuItem("SwapRKill", "Swap R when target dead").SetValue(true));
             menu.SubMenu("misc").AddItem(new MenuItem("SafeRBack", "Safe swap calculation").SetValue(true));
             menu.SubMenu("misc").AddItem(
                 new MenuItem("Flee", "Flee Key").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
@@ -152,7 +152,7 @@ namespace ZedSharp {
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
-            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy"))
+            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) && menu.Item("SwapRKill").GetValue<bool>())
             {
                 if (Zed.canGoToShadow("R"))
                 {
@@ -204,6 +204,7 @@ namespace ZedSharp {
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             Obj_AI_Hero target2 = SimpleTs.GetTarget(Zed.R.Range + Zed.Q.Range, SimpleTs.DamageType.Physical);
+            
             if (menu.Item("shadowCoax").GetValue<KeyBind>().Active)
             {
                 //Game.PrintChat("Hello!");
@@ -211,7 +212,7 @@ namespace ZedSharp {
             }
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
-                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range)
+                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range && menu.Item("use"+target.ChampionName).GetValue<bool>())
                         Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
