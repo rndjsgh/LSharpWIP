@@ -67,7 +67,9 @@ namespace ZedSharp {
             menu.SubMenu("combo").AddItem(new MenuItem("useEC", "Use E in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useRC", "Use R in combo").SetValue(true));
             menu.SubMenu("combo").AddItem(new MenuItem("useWF", "Use W to follow").SetValue(true));
-            menu.SubMenu("combo").AddItem(new MenuItem("shadowCoax", "Do Shadow Coax").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+            menu.SubMenu("combo").AddItem(
+                new MenuItem("shadowCoax", "Do Shadow Coax").SetValue(new KeyBind("T".ToCharArray()[0],
+                    KeyBindType.Press)));
             //menu.SubMenu("combo").AddItem(new MenuItem("minQ", "Minimum Q to Hit").SetValue(new Slider(2, 1, 3)));
             //menu.SubMenu("combo").AddItem(new MenuItem("minE", "Minimum E to Hit").SetValue(new Slider(2, 1, 3)));
 
@@ -152,10 +154,9 @@ namespace ZedSharp {
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
-            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) && menu.Item("SwapRKill").GetValue<bool>())
-            {
-                if (Zed.canGoToShadow("R"))
-                {
+            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) &&
+                menu.Item("SwapRKill").GetValue<bool>()) {
+                if (Zed.canGoToShadow("R")) {
                     Zed.R.Cast();
                 }
             }
@@ -204,15 +205,15 @@ namespace ZedSharp {
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             Obj_AI_Hero target2 = SimpleTs.GetTarget(Zed.R.Range + Zed.Q.Range, SimpleTs.DamageType.Physical);
-            
-            if (menu.Item("shadowCoax").GetValue<KeyBind>().Active)
-            {
+
+            if (menu.Item("shadowCoax").GetValue<KeyBind>().Active) {
                 //Game.PrintChat("Hello!");
                 Zed.shadowCoax(target2);
             }
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
-                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range && menu.Item("use"+target.ChampionName).GetValue<bool>())
+                    if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range &&
+                        menu.Item("use" + target.ChampionName).GetValue<bool>())
                         Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
@@ -243,18 +244,19 @@ namespace ZedSharp {
         }
 
         private static void onDraw(EventArgs args) {
-           // Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
-           // Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
-           // Utility.DrawCircle(shadowPos, 100, Color.Yellow);
-            foreach (var Hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy && h.Distance(Zed.shadowW.Position)<=Zed.R.Range))
-            {
-                if (Zed.isKillableShadowCoax(Hero) && Zed.R.IsReady())
-                {
-                    var pScreen = Drawing.WorldToScreen(Hero.Position);
+            // Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
+            // Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
+            // Utility.DrawCircle(shadowPos, 100, Color.Yellow);
+            foreach (
+                Obj_AI_Hero Hero in
+                    ObjectManager.Get<Obj_AI_Hero>().Where(
+                        h => h.IsEnemy && h.Distance(Zed.shadowW.Position) <= Zed.R.Range)) {
+                if (Zed.isKillableShadowCoax(Hero) && Zed.R.IsReady()) {
+                    Vector2 pScreen = Drawing.WorldToScreen(Hero.Position);
                     pScreen[0] -= 20;
                     Drawing.DrawText(pScreen.X - 60, pScreen.Y, Color.Red, "Killable by Shadow Coax");
                     //Utility.DrawCircle(Hero.Position,100f,Color.Blue);
-                }   
+                }
             }
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Utility.DrawCircle(Zed.shadowW.Position, 100, Color.Red);

@@ -126,7 +126,8 @@ namespace ZedSharp {
                             Q.Cast(target, true, true);
                         }
                     }
-                } else if (Q.IsReady() && shadowW == null) {
+                }
+                else if (Q.IsReady() && shadowW == null) {
                     if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
                         Q.UpdateSourcePosition(Player.Position, Player.Position);
                         Q.Cast(target, true, true);
@@ -143,18 +144,18 @@ namespace ZedSharp {
 
         public static bool isKillableShadowCoax(Obj_AI_Hero target) {
             float health = target.Health;
-            int igniteDMG = sumItems.isIgniteReady()?50 + 20*Player.Level:0;
-            float botrkDmg = Items.HasItem(3153) && Items.CanUseItem(3153) ?target.MaxHealth*0.1f:0f;
+            int igniteDMG = sumItems.isIgniteReady() ? 50 + 20*Player.Level : 0;
+            float botrkDmg = Items.HasItem(3153) && Items.CanUseItem(3153) ? target.MaxHealth*0.1f : 0f;
             float cutLassDmg;
-            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG +botrkDmg >=
+            return Q.GetDamage(target) + E.GetDamage(target) + Player.GetAutoAttackDamage(target)*2 + igniteDMG +
+                   botrkDmg >=
                    health;
         }
 
-        public static void shadowCoax(Obj_AI_Hero target)
-        {
+        public static void shadowCoax(Obj_AI_Hero target) {
             Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-           // Game.PrintChat("Wut");
-            if (shadowW == null || !canGoToShadow("W") || !Zed.isKillableShadowCoax((Obj_AI_Hero) target)) return;
+            // Game.PrintChat("Wut");
+            if (shadowW == null || !canGoToShadow("W") || !isKillableShadowCoax(target)) return;
             //var target =
             //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
             if (target == null || !canDoCombo(new[] {SpellSlot.Q, SpellSlot.E, SpellSlot.R})) return;
@@ -176,21 +177,20 @@ namespace ZedSharp {
             if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
             sumItems.castIgnite(target);
             castItemsFull(target);
-           // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
-           //     R.Cast();
-          //  }
+            // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
+            //     R.Cast();
+            //  }
         }
 
-        public static void doShadowCoax(Obj_AI_Hero target) {
+        /*public static void doShadowCoax(Obj_AI_Hero target) {
             if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
-                    isKillableShadowCoax(target) && target.Distance(shadowW.Position) <= R.Range) {
+                isKillableShadowCoax(target) && target.Distance(shadowW.Position) <= R.Range) {
                 shadowCoax(target);
             }
-        }
+        }*/
 
         public static void doLaneCombo(Obj_AI_Base target) {
             try {
-                
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
@@ -294,7 +294,8 @@ namespace ZedSharp {
                         if (target.Distance(shadowW) <= Q.Range) {
                             Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
                             Q.Cast(target, true, true);
-                        } else if (target.Distance(Player) <= Q.Range) {
+                        }
+                        else if (target.Distance(Player) <= Q.Range) {
                             Q.UpdateSourcePosition(Player.Position, Player.Position);
                             Q.Cast(target, true, true);
                         }
