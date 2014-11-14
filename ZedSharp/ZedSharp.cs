@@ -196,10 +196,11 @@ namespace ZedSharp {
 
             Zed.Flee();
             Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
+            Obj_AI_Hero target2 = SimpleTs.GetTarget(Zed.R.Range + Zed.Q.Range, SimpleTs.DamageType.Physical);
             if (menu.Item("shadowCoax").GetValue<KeyBind>().Active)
             {
                 //Game.PrintChat("Hello!");
-                Zed.shadowCoax(target);
+                Zed.shadowCoax(target2);
             }
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
@@ -234,9 +235,19 @@ namespace ZedSharp {
         }
 
         private static void onDraw(EventArgs args) {
-            Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
-            Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
-            Utility.DrawCircle(shadowPos, 100, Color.Yellow);
+           // Obj_AI_Hero pl = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(h => h.IsEnemy);
+           // Vector3 shadowPos = pl.Position + Vector3.Normalize(pl.Position - ObjectManager.Player.Position)*Zed.W.Range;
+           // Utility.DrawCircle(shadowPos, 100, Color.Yellow);
+            foreach (var Hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsEnemy && h.Distance(Zed.shadowW.Position)<=Zed.R.Range))
+            {
+                if (Zed.isKillableShadowCoax(Hero))
+                {
+                    var pScreen = Drawing.WorldToScreen(Hero.Position);
+                    pScreen[0] -= 20;
+                    Drawing.DrawText(pScreen.X - 60, pScreen.Y, Color.Red, "Killable by Shadow Coax");
+                    //Utility.DrawCircle(Hero.Position,100f,Color.Blue);
+                }   
+            }
             if (Zed.shadowW != null && !Zed.shadowW.IsDead)
                 Utility.DrawCircle(Zed.shadowW.Position, 100, Color.Red);
         }
