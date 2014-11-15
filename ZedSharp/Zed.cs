@@ -123,7 +123,7 @@ namespace ZedSharp {
                     if (Q.IsReady()) {
                         if (target.Distance(shadowW) <= Q.Range) {
                             Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
-                            Q.Cast(target, true, true);
+                            Q.Cast(target, true);
                         }
                         else if (target.Distance(Player) <= Q.Range) {
                             Q.UpdateSourcePosition(Player.Position, Player.Position);
@@ -304,7 +304,7 @@ namespace ZedSharp {
                                 if (Q.IsReady()) {
                                     if (target.Distance(shadowW) <= Q.Range) {
                                         Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
-                                        Q.Cast(target, true, true);
+                                        Q.Cast(target, true);
                                     }
                                     else if (target.Distance(Player) <= Q.Range) {
                                         Q.UpdateSourcePosition(Player.Position, Player.Position);
@@ -316,9 +316,9 @@ namespace ZedSharp {
                             }
                             if (shadowW == null) {
                                 if (Q.IsReady()) {
-                                    if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
+                                    if (Q.GetPrediction(target).Hitchance >= customHitchance) {
                                         Q.UpdateSourcePosition(Player.Position, Player.Position);
-                                        Q.Cast(target, true, true);
+                                        Q.Cast(target, true);
                                     }
                                 }
                             }
