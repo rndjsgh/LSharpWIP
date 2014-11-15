@@ -104,10 +104,10 @@ namespace ZedSharp {
             menu.AddSubMenu(new Menu("Draw Options", "draw"));
             menu.SubMenu("draw").AddItem(new MenuItem("drawHp", "Draw predicted hp").SetValue(true));
 
-            menu.AddSubMenu(new Menu("Speech Options", "spoken"));
+            /*menu.AddSubMenu(new Menu("Speech Options", "spoken"));
             menu.SubMenu("spoken").AddItem(new MenuItem("speech", "Enabled").SetValue(true));
             menu.SubMenu("spoken").AddItem(new MenuItem("speechinterval", "delay").SetValue(new Slider(1000, 250, 5000))); 
-
+            */
             menu.AddSubMenu(new Menu("Misc Options", "misc"));
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true)); //dont need %
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
@@ -140,14 +140,14 @@ namespace ZedSharp {
 
                 Zed.setSkillshots();
 
-                loadSpeech();
+               // loadSpeech();
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        private static void loadSpeech() {
+        /*private static void loadSpeech() {
             speechList.Add(new[] {"theline", "linecombo", "goham", "recall"});
             gr = new Grammar(new GrammarBuilder(speechList));
             speechTimer = new Timer(TimerCallBack, null, 0, menu.Item("speechinterval").GetValue<Slider>().Value);
@@ -167,9 +167,9 @@ namespace ZedSharp {
                     Console.WriteLine(e.Message);
                 }
             }
-        }
+        }*/
 
-        private static void sRecognize_SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
+        /*private static void sRecognize_SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
             var target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
             switch (e.Result.Text) {
                 case "theline":
@@ -181,7 +181,7 @@ namespace ZedSharp {
                     recallSlot.Cast();
                     break;
             }
-        }
+        }*/
 
         private static void OnGameProcessPacket(GamePacketEventArgs args) {}
 
