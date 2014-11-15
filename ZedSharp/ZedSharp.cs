@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
+using System.Text;
 using System.Threading;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -37,7 +38,7 @@ namespace ZedSharp {
         public static Timer speechTimer;
         private static bool wantSpeech;
         private static int oldInterval;
-        static Spell recallSlot = new Spell(SpellSlot.Recall);
+        private static Spell recallSlot = new Spell(SpellSlot.Recall);
 
         public static HpBarIndicator hpi = new HpBarIndicator();
         public static bool W2;
@@ -140,7 +141,7 @@ namespace ZedSharp {
 
                 Zed.setSkillshots();
 
-               // loadSpeech();
+                // loadSpeech();
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
@@ -183,7 +184,18 @@ namespace ZedSharp {
             }
         }*/
 
-        private static void OnGameProcessPacket(GamePacketEventArgs args) {}
+        private static void OnGameProcessPacket(GamePacketEventArgs args) {
+            if (args.PacketData[0] == 23) {
+                var gp = new GamePacket(args.PacketData) {Position = 1};
+                int id = gp.ReadInteger();
+                if (id == Zed.Player.NetworkId &&
+                    Encoding.UTF8.GetString(args.PacketData, 0, args.PacketData.Length).Contains("ZedW2")) {
+                    Zed.serverTookWCast = true;
+                    Zed.wIsCasted = false;
+                    Console.WriteLine("W.iscasted");
+                }
+            }
+        }
 
         private static void OnGameSendPacket(GamePacketEventArgs args) {}
 
@@ -208,12 +220,12 @@ namespace ZedSharp {
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args) {
-            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) &&
+            /* if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) &&
                 menu.Item("SwapRKill").GetValue<bool>()) {
                 if (Zed.canGoToShadow("R")) {
-                    Zed.R.Cast();
+                    Zed.R.Cast(); TODO fixerino
                 }
-            }
+            }*/
             if (sender is Obj_AI_Minion) {
                 var min = sender as Obj_AI_Minion;
                 if (min.IsAlly && min.BaseSkinName == "ZedShadow") {
@@ -263,7 +275,7 @@ namespace ZedSharp {
             if (menu.Item("shadowCoax").GetValue<KeyBind>().Active) {
                 Zed.shadowCoax(target2);
             }
-            setInterval();
+            //setInterval();
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range &&
@@ -282,9 +294,12 @@ namespace ZedSharp {
                     Zed.doLastHit();
                     break;
             }
+
+            if (LXOrbwalker.CurrentMode != LXOrbwalker.Mode.Combo)
+                Zed.serverTookWCast = false;
         }
 
-        private static void setInterval() {
+        /*private static void setInterval() {
             wantSpeech = menu.Item("speech").GetValue<bool>();
             if (wantSpeech) {
                 int speechInterval = menu.Item("speechinterval").GetValue<Slider>().Value;
@@ -297,7 +312,7 @@ namespace ZedSharp {
                     oldInterval = speechInterval;
                 }
             }
-        }
+        }*/
 
 
         private static void OnEndScene(EventArgs args) {

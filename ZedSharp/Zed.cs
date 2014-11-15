@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Speech.Recognition;
-using System.Timers;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -44,6 +42,10 @@ namespace ZedSharp {
         public static bool getWshad;
         public static Obj_AI_Minion shadowR;
         public static float LastWCast;
+
+        public static bool wIsCasted = false;
+        public static bool serverTookWCast = false;
+        public static float recast = 0;
 
         public static bool test = false;
 
@@ -193,24 +195,26 @@ namespace ZedSharp {
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
-                    canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
+                canDoCombo(new[] { SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R })) {
                     R.Cast(target);
                 }
                 //eather casts 2 times or 0 get it to cast 1 time TODO
                 // Game.PrintChat("W2 "+ZedSharp.W2);
                 /*foreach (
-                    Obj_AI_Hero newtarget in
-                        ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
-                            enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
-                    target = newtarget;
+                Obj_AI_Hero newtarget in
+                ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)).Where(
+                enemy => enemy.HasBuff("zedulttargetmark") && enemy.IsEnemy && !enemy.IsMinion)) {
+                target = newtarget;
                 }*/
                 //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
-                Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
-                if (Environment.TickCount - LastWCast < 300) return;
-                LastWCast = Environment.TickCount;
-                if (W.IsReady() && shadowW == null && !getWshad) {
+                Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position) * E.Range;
+                if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
-                    W.Cast(shadowPos, true);
+                    Console.WriteLine("cast WWW");
+                    W.Cast(shadowPos);
+                    serverTookWCast = false;
+                    wIsCasted = true;
+                    recast = Environment.TickCount + 300;
                 }
                 if (E.IsReady() && shadowW != null || shadowR != null) {
                     E.Cast();
@@ -219,10 +223,10 @@ namespace ZedSharp {
                     float midDist = dist;
                     midDist += target.Distance(shadowR);
                     midDist += target.Distance(shadowW);
-                    float delay = midDist/(Q.Speed*3);
-                    PredictionOutput po = Prediction.GetPrediction(target, delay*1.1f);
+                    float delay = midDist / (Q.Speed * 3);
+                    PredictionOutput po = Prediction.GetPrediction(target, delay * 1.1f);
                     if (po.Hitchance > HitChance.Low) {
-                        Console.WriteLine("Cast QQQQ");
+                        // Console.WriteLine("Cast QQQQ");
                         Q.Cast(po.UnitPosition);
                     }
                 }
