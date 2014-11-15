@@ -75,9 +75,9 @@ namespace ZedSharp {
             //menu.SubMenu("combo").AddItem(new MenuItem("minE", "Minimum E to Hit").SetValue(new Slider(2, 1, 3)));
 
             menu.AddSubMenu(new Menu("Harass Options", "harass"));
-            menu.SubMenu("harass").AddItem(new MenuItem("useQH", "Use Q in harass").SetValue(true));
-            menu.SubMenu("harass").AddItem(new MenuItem("useWH", "Use W in harass").SetValue(false));
-            menu.SubMenu("harass").AddItem(new MenuItem("useEH", "Use E in harass").SetValue(false));
+            menu.SubMenu("harass").AddItem(
+                new MenuItem("harassMode", "Harass Mode").SetValue(new StringList(new[] {"WEQ", "QE", "Q", "E"})));
+            menu.SubMenu("harass").AddItem(new MenuItem("harassEnabled", "Enabled").SetValue(true));
 
             menu.AddSubMenu(new Menu("Laneclear", "laneclear"));
             menu.SubMenu("laneclear").AddItem(new MenuItem("useQLC", "Use Q to laneclear").SetValue(false));
@@ -204,11 +204,10 @@ namespace ZedSharp {
             Zed.checkForSwap("LowHP");
 
             Zed.Flee();
-            Obj_AI_Hero target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
+            Obj_AI_Hero target = SimpleTs.GetTarget(Zed.Q.Range + Zed.W.Range, SimpleTs.DamageType.Physical);
             Obj_AI_Hero target2 = SimpleTs.GetTarget(Zed.R.Range + Zed.Q.Range, SimpleTs.DamageType.Physical);
 
             if (menu.Item("shadowCoax").GetValue<KeyBind>().Active) {
-                //Game.PrintChat("Hello!");
                 Zed.shadowCoax(target2);
             }
             switch (LXOrbwalker.CurrentMode) {
@@ -217,10 +216,10 @@ namespace ZedSharp {
                         menu.Item("useRC").GetValue<bool>() && menu.Item("use" + target.ChampionName).GetValue<bool>())
                         Zed.doLaneCombo(target);
                     else
-                        Zed.normalCombo();
+                        Zed.normalCombo(target);
                     break;
                 case LXOrbwalker.Mode.Harass:
-                    Zed.doHarass();
+                    Zed.doHarass(target);
                     break;
                 case LXOrbwalker.Mode.LaneClear:
                     Zed.doLaneClear();

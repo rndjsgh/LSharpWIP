@@ -96,49 +96,44 @@ namespace ZedSharp {
             return false;
         }
 
-        public static void normalCombo() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
-
+        public static void normalCombo(Obj_AI_Hero target) {
             if (Environment.TickCount - LastWCast < 300) return;
-            LastWCast = Environment.TickCount;
-
-            if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad) {
-                if (ZedSharp.menu.Item("useWC").GetValue<bool>() && Q.IsReady() || E.IsReady()) {
+            if (target.IsValidTarget(W.Range + Q.Range) && target.Distance(Player) < W.Range + Q.Range) {
+                if (W.IsReady() && shadowW == null && !getWshad && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
+                    // Throw W
                     W.Cast(target.Position, true);
+                    LastWCast = Environment.TickCount;
                 }
-
-                if (ZedSharp.menu.Item("useWF").GetValue<bool>() && canGoToShadow("W") &&
-                    ZedSharp.menu.Item("useWC").GetValue<bool>()) {
-                    if (target.Distance(shadowW) < Q.Range + 600)
-                        W.Cast(true);
+                if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
+                    Player.Distance(shadowW) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
+                    // Cast E..
+                    E.Cast(true);
                 }
-            }
-
-            if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
-                if (shadowW != null) {
-                    if (Q.IsReady()) {
-                        if (target.Distance(shadowW) <= Q.Range) {
-                            Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
-                            Q.Cast(target, true, true);
+                if (ZedSharp.menu.Item("useQC").GetValue<bool>()) {
+                    if (shadowW != null) {
+                        // if shadow is not null update source position.
+                        if (Q.IsReady()) {
+                            if (target.Distance(shadowW) <= Q.Range) {
+                                Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
+                                Q.Cast(target, true, true);
+                            }
+                            else if (target.Distance(Player) <= Q.Range) {
+                                Q.UpdateSourcePosition(Player.Position, Player.Position);
+                                PredictionOutput QPrediction = Q.GetPrediction(target);
+                                if (QPrediction.Hitchance >= HitChance.Medium)
+                                    Q.Cast(QPrediction.CastPosition, true);
+                            }
                         }
-                        if (target.Distance(Player) <= Q.Range) {
-                            Q.UpdateSourcePosition(Player.Position, Player.Position);
-                            Q.Cast(target, true, true);
+                    }
+                    if (shadowW == null) {
+                        if (Q.IsReady()) {
+                            if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
+                                Q.UpdateSourcePosition(Player.Position, Player.Position);
+                                Q.Cast(target, true, true);
+                            }
                         }
                     }
                 }
-                else if (Q.IsReady() && shadowW == null) {
-                    if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
-                        Q.UpdateSourcePosition(Player.Position, Player.Position);
-                        Q.Cast(target, true, true);
-                    }
-                }
-            }
-
-
-            if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
-                Player.Distance(target) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
-                E.Cast(true);
             }
         }
 
@@ -154,7 +149,7 @@ namespace ZedSharp {
 
         public static void shadowCoax(Obj_AI_Hero target) {
             Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-           // Game.PrintChat("Wut");
+            // Game.PrintChat("Wut");
             if (shadowW == null || !canGoToShadow("W") || !isKillableShadowCoax(target)) return;
             //var target =
             //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
@@ -177,9 +172,9 @@ namespace ZedSharp {
             if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
             sumItems.castIgnite(target);
             castItemsFull(target);
-           // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
-           //     R.Cast();
-          //  }
+            // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
+            //     R.Cast();
+            //  }
         }
 
         /*public static void doShadowCoax(Obj_AI_Hero target) {
@@ -268,46 +263,79 @@ namespace ZedSharp {
             if (ListOfEnemies.Count > 0 && E.IsReady()) E.Cast(true);
         }
 
-        private static bool canDoCombo(IEnumerable<SpellSlot> sp)
-        {
-            float delay = sp.Sum(sp1 => Player.Spellbook.GetSpell(sp1).SData.SpellCastTime);//Hope it is correct
+        private static bool canDoCombo(IEnumerable<SpellSlot> sp) {
+            float delay = sp.Sum(sp1 => Player.Spellbook.GetSpell(sp1).SData.SpellCastTime); //Hope it is correct
             float totalCost = sp.Sum(sp1 => Player.Spellbook.GetManaCost(sp1));
-            return Player.Mana + delay * 5 >= totalCost;
+            return Player.Mana + delay*5 >= totalCost;
         }
 
-        public static void doHarass() {
-            Obj_AI_Hero target = SimpleTs.GetTarget(1500, SimpleTs.DamageType.Physical);
-
+        public static void doHarass(Obj_AI_Hero target) {
             if (Environment.TickCount - LastWCast < 300) return;
-            LastWCast = Environment.TickCount;
-            if (W.IsReady() && target.Distance(Player) < Q.Range + Q.Range && shadowW == null && !getWshad &&
-                ZedSharp.menu.Item("useWH").GetValue<bool>()) {
-                W.Cast(target.Position, true);
-            }
-
-            if (E.IsReady() && ZedSharp.menu.Item("useEH").GetValue<bool>() && target.Distance(shadowW) <= E.Range ||
-                Player.Distance(target) <= E.Range) {
-                E.Cast(true);
-            }
-
-            if (ZedSharp.menu.Item("useQH").GetValue<bool>()) {
-                if (shadowW != null) {
-                    if (Q.IsReady()) {
-                        if (target.Distance(shadowW) <= Q.Range) {
-                            Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
-                            Q.Cast(target, true, true);
-                        } else if (target.Distance(Player) <= Q.Range) {
-                            Q.UpdateSourcePosition(Player.Position, Player.Position);
-                            var QPrediction = Q.GetPrediction(target);
-                            if (QPrediction.Hitchance > HitChance.Low) Q.Cast(QPrediction.CastPosition, true);
+            if (ZedSharp.menu.Item("harassEnabled").GetValue<bool>()) {
+                switch (ZedSharp.menu.Item("harassMode").GetValue<StringList>().SelectedIndex) {
+                    case 0: //WEQ
+                        if (target.IsValidTarget(W.Range + Q.Range) && target.Distance(Player) < W.Range + Q.Range) {
+                            if (W.IsReady() && shadowW == null && !getWshad) {
+                                // Throw W
+                                W.Cast(target.Position, true);
+                                LastWCast = Environment.TickCount;
+                            }
+                            if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
+                                Player.Distance(shadowW) <= E.Range) {
+                                // Cast E..
+                                E.Cast(true);
+                            }
+                            if (shadowW != null) {
+                                // if shadow is not null update source position.
+                                if (Q.IsReady()) {
+                                    if (target.Distance(shadowW) <= Q.Range) {
+                                        Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
+                                        Q.Cast(target, true, true);
+                                    }
+                                    else if (target.Distance(Player) <= Q.Range) {
+                                        Q.UpdateSourcePosition(Player.Position, Player.Position);
+                                        PredictionOutput QPrediction = Q.GetPrediction(target);
+                                        if (QPrediction.Hitchance >= HitChance.Medium)
+                                            Q.Cast(QPrediction.CastPosition, true);
+                                    }
+                                }
+                            }
+                            if (shadowW == null) {
+                                if (Q.IsReady()) {
+                                    if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
+                                        Q.UpdateSourcePosition(Player.Position, Player.Position);
+                                        Q.Cast(target, true, true);
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-                else if (Q.IsReady() && shadowW == null) {
-                    if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
-                        Q.UpdateSourcePosition(Player.Position, Player.Position);
-                        Q.Cast(target, true, true);
-                    }
+                        break;
+                    case 1: //QE
+                        if (target.Distance(Player) <= Q.Range && target.IsValidTarget(Q.Range)) {
+                            PredictionOutput QPrediction = Q.GetPrediction(target);
+                            if (QPrediction.Hitchance >= HitChance.Medium && Q.IsReady())
+                                Q.Cast(QPrediction.CastPosition, true);
+                        }
+                        if (target.Distance(Player) <= E.Range && target.IsValidTarget(W.Range)) {
+                            if (E.IsReady()) {
+                                E.Cast(true);
+                            }
+                        }
+                        break;
+                    case 2: //Q
+                        if (target.Distance(Player) <= Q.Range && target.IsValidTarget(Q.Range) && Q.IsReady()) {
+                            PredictionOutput QPrediction = Q.GetPrediction(target);
+                            if (QPrediction.Hitchance >= HitChance.Medium)
+                                Q.Cast(QPrediction.CastPosition, true);
+                        }
+                        break;
+                    case 3: // E
+                        if (target.Distance(Player) <= E.Range && target.IsValidTarget(W.Range)) {
+                            if (E.IsReady()) {
+                                E.Cast(true);
+                            }
+                        }
+                        break;
                 }
             }
         }
