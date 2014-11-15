@@ -101,7 +101,6 @@ namespace ZedSharp {
         }
 
         public static void normalCombo(Obj_AI_Hero target) {
-            if (Environment.TickCount - LastWCast < 300) return;
             if (target.IsValidTarget(W.Range + Q.Range)) {
                 if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                     // Throw W
@@ -280,7 +279,6 @@ namespace ZedSharp {
         }
 
         public static void doHarass(Obj_AI_Hero target) {
-            if (Environment.TickCount - LastWCast < 300) return;
             if (ZedSharp.menu.Item("harassEnabled").GetValue<bool>()) {
                 switch (ZedSharp.menu.Item("harassMode").GetValue<StringList>().SelectedIndex) {
                     case 0: //WEQ
