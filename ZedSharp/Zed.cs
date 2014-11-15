@@ -102,7 +102,8 @@ namespace ZedSharp {
 
         public static void normalCombo(Obj_AI_Hero target) {
             if (target.IsValidTarget(W.Range + Q.Range)) {
-                if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
+                if (W.IsReady() && shadowW == null &&
+                    ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                     // Throw W
                     W.Cast(target.Position, true);
                     serverTookWCast = false;
@@ -110,12 +111,10 @@ namespace ZedSharp {
                     recast = Environment.TickCount + 300;
                 }
             }
-            if (target.IsValidTarget(E.Range)) {
-                if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
-                    Player.Distance(shadowW) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
-                    // Cast E..
-                    E.Cast(true);
-                }
+            if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
+                Player.Distance(shadowW) <= E.Range && ZedSharp.menu.Item("useEC").GetValue<bool>()) {
+                // Cast E..
+                E.Cast(true);
             }
             if (ZedSharp.menu.Item("useQC").GetValue<bool>() && target.IsValidTarget(Q.Range)) {
                 if (shadowW != null) {
@@ -196,7 +195,7 @@ namespace ZedSharp {
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
                 if (R.IsReady() && shadowR == null && dist < R.Range &&
-                canDoCombo(new[] { SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R })) {
+                    canDoCombo(new[] {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R})) {
                     R.Cast(target);
                 }
                 //eather casts 2 times or 0 get it to cast 1 time TODO
@@ -208,8 +207,9 @@ namespace ZedSharp {
                 target = newtarget;
                 }*/
                 //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
-                Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position) * E.Range;
-                if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
+                Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
+                if (W.IsReady() && shadowW == null &&
+                    ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
                     Console.WriteLine("cast WWW");
                     W.Cast(shadowPos);
@@ -224,8 +224,8 @@ namespace ZedSharp {
                     float midDist = dist;
                     midDist += target.Distance(shadowR);
                     midDist += target.Distance(shadowW);
-                    float delay = midDist / (Q.Speed * 3);
-                    PredictionOutput po = Prediction.GetPrediction(target, delay * 1.1f);
+                    float delay = midDist/(Q.Speed*3);
+                    PredictionOutput po = Prediction.GetPrediction(target, delay*1.1f);
                     if (po.Hitchance > HitChance.Low) {
                         // Console.WriteLine("Cast QQQQ");
                         Q.Cast(po.UnitPosition);
@@ -283,7 +283,8 @@ namespace ZedSharp {
                 switch (ZedSharp.menu.Item("harassMode").GetValue<StringList>().SelectedIndex) {
                     case 0: //WEQ
                         if (target.IsValidTarget(W.Range + Q.Range)) {
-                            if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
+                            if (W.IsReady() && shadowW == null &&
+                                ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                                 // Throw W
                                 W.Cast(target.Position, true);
                                 serverTookWCast = false;
@@ -291,13 +292,12 @@ namespace ZedSharp {
                                 recast = Environment.TickCount + 300;
                             }
                         }
-                        if (target.IsValidTarget(E.Range)) {
                             if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
                                 Player.Distance(shadowW) <= E.Range) {
                                 // Cast E..
                                 E.Cast(true);
                             }
-                        }
+                        
                         if (target.IsValidTarget(Q.Range)) {
                             if (shadowW != null) {
                                 // if shadow is not null update source position.
@@ -310,7 +310,7 @@ namespace ZedSharp {
                                         Q.UpdateSourcePosition(Player.Position, Player.Position);
                                         PredictionOutput QPrediction = Q.GetPrediction(target);
                                         if (QPrediction.Hitchance >= HitChance.Medium)
-                                            Q.Cast(QPrediction.CastPosition, true);
+                                            Q.Cast(QPrediction.UnitPosition);
                                     }
                                 }
                             }
@@ -318,7 +318,7 @@ namespace ZedSharp {
                                 if (Q.IsReady()) {
                                     if (Q.GetPrediction(target).Hitchance >= customHitchance) {
                                         Q.UpdateSourcePosition(Player.Position, Player.Position);
-                                        Q.Cast(target, true);
+                                        Q.Cast(target);
                                     }
                                 }
                             }
@@ -328,7 +328,7 @@ namespace ZedSharp {
                         if (target.Distance(Player) <= Q.Range && target.IsValidTarget(Q.Range)) {
                             PredictionOutput QPrediction = Q.GetPrediction(target);
                             if (QPrediction.Hitchance >= HitChance.Medium && Q.IsReady())
-                                Q.Cast(QPrediction.CastPosition, true);
+                                Q.Cast(QPrediction.UnitPosition);
                         }
                         if (target.Distance(Player) <= E.Range && target.IsValidTarget(W.Range)) {
                             if (E.IsReady()) {
@@ -340,7 +340,7 @@ namespace ZedSharp {
                         if (target.Distance(Player) <= Q.Range && target.IsValidTarget(Q.Range) && Q.IsReady()) {
                             PredictionOutput QPrediction = Q.GetPrediction(target);
                             if (QPrediction.Hitchance >= HitChance.Medium)
-                                Q.Cast(QPrediction.CastPosition, true);
+                                Q.Cast(QPrediction.UnitPosition);
                         }
                         break;
                     case 3: // E
