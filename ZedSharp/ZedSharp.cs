@@ -176,7 +176,7 @@ namespace ZedSharp {
                 case "theline":
                 case "linecombo":
                 case "goham":
-                    Zed.doLaneCombo(target);
+                    Zed.doLineCombo(target);
                     break;
                 case "recall":
                     recallSlot.Cast();
@@ -280,7 +280,7 @@ namespace ZedSharp {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range &&
                         menu.Item("useRC").GetValue<bool>() && menu.Item("use" + target.ChampionName).GetValue<bool>())
-                        Zed.doLaneCombo(target);
+                        Zed.doLineCombo(target);
                     else
                         Zed.normalCombo(target);
                     break;

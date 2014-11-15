@@ -103,10 +103,12 @@ namespace ZedSharp {
         public static void normalCombo(Obj_AI_Hero target) {
             if (Environment.TickCount - LastWCast < 300) return;
             if (target.IsValidTarget(W.Range + Q.Range)) {
-                if (W.IsReady() && shadowW == null && !getWshad && ZedSharp.menu.Item("useWC").GetValue<bool>()) {
+                if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                     // Throw W
                     W.Cast(target.Position, true);
-                    LastWCast = Environment.TickCount;
+                    serverTookWCast = false;
+                    wIsCasted = true;
+                    recast = Environment.TickCount + 300;
                 }
             }
             if (target.IsValidTarget(E.Range)) {
@@ -190,7 +192,7 @@ namespace ZedSharp {
             }
         }*/
 
-        public static void doLaneCombo(Obj_AI_Base target) {
+        public static void doLineCombo(Obj_AI_Base target) {
             try {
                 //Tried to Add shadow Coax
                 float dist = Player.Distance(target);
@@ -283,10 +285,12 @@ namespace ZedSharp {
                 switch (ZedSharp.menu.Item("harassMode").GetValue<StringList>().SelectedIndex) {
                     case 0: //WEQ
                         if (target.IsValidTarget(W.Range + Q.Range)) {
-                            if (W.IsReady() && shadowW == null && !getWshad) {
+                            if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
                                 // Throw W
                                 W.Cast(target.Position, true);
-                                LastWCast = Environment.TickCount;
+                                serverTookWCast = false;
+                                wIsCasted = true;
+                                recast = Environment.TickCount + 300;
                             }
                         }
                         if (target.IsValidTarget(E.Range)) {
