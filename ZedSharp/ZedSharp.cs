@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -138,7 +139,23 @@ namespace ZedSharp
             }
         }
 
-        private static void OnGameProcessPacket(GamePacketEventArgs args) { }
+        private static void OnGameProcessPacket(GamePacketEventArgs args)
+        {
+            if (args.PacketData[0] == 23)
+            {
+                GamePacket gp = new GamePacket(args.PacketData);
+                gp.Position = 1;
+                int id = gp.ReadInteger();
+                if (id == Zed.Player.NetworkId && Encoding.UTF8.GetString(args.PacketData, 0, args.PacketData.Length).Contains("ZedW2"))
+                {
+                    Zed.serverTookWCast = true;
+                    Zed.wIsCasted = false;
+                    Console.WriteLine("W.iscasted");
+                }
+
+
+            }
+        }
 
         private static void OnGameSendPacket(GamePacketEventArgs args) { }
 
@@ -168,27 +185,26 @@ namespace ZedSharp
 
         private static void OnCreateObject(GameObject sender, EventArgs args)
         {
-            if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) && menu.Item("SwapRKill").GetValue<bool>())
+            /*if (sender.Name.Equals("Zed_ShadowIndicatorNEARBloop.troy") && Zed.isSafeSwap(Zed.shadowR) && menu.Item("SwapRKill").GetValue<bool>())
             {
                 if (Zed.canGoToShadow("R"))
                 {
                     Zed.R.Cast();
                 }
-            }
+            }*/
             if (sender is Obj_AI_Minion)
             {
                 var min = sender as Obj_AI_Minion;
-                if (min.IsAlly && min.BaseSkinName == "ZedShadow")
+               // Game.PrintChat(min.BaseSkinName);
+                if (min.IsAlly && min.BaseSkinName == "zedshadow")
                 {
                     if (Zed.getRshad)
                     {
-                        // Game.PrintChat("R Create");
                         Zed.shadowR = min;
                         Zed.getRshad = false;
                     }
                     if (Zed.getWshad)
                     {
-                        //Game.PrintChat("W Created");
                         Zed.shadowW = min;
                         Zed.getWshad = false;
                     }
@@ -251,6 +267,8 @@ namespace ZedSharp
                     Zed.doLastHit();
                     break;
             }
+            if (LXOrbwalker.CurrentMode != LXOrbwalker.Mode.Combo)
+                Zed.serverTookWCast = false;
         }
 
 

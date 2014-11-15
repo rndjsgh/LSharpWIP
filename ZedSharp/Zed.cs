@@ -19,6 +19,12 @@ namespace ZedSharp {
             Ekill = 8,
         }
 
+        //W checks
+        public static bool wIsCasted = false;
+        public static bool serverTookWCast = false;
+        public static float recast = 0;
+
+
         public const HitChance customHitchance = HitChance.Medium;
         //Easiest
 
@@ -207,11 +213,14 @@ namespace ZedSharp {
                 }*/
                 //PredictionOutput p1o = Prediction.GetPrediction(target, 0.350f);
                 Vector3 shadowPos = target.Position + Vector3.Normalize(target.Position - shadowR.Position)*E.Range;
-                if (Environment.TickCount - LastWCast < 300) return;
-                LastWCast = Environment.TickCount;
-                if (W.IsReady() && shadowW == null && !getWshad) {
+                if (W.IsReady() && shadowW == null && ((!getWshad && recast < Environment.TickCount && !serverTookWCast)))
+                {
                     //V2E(shadowR.Position, po.UnitPosition, E.Range)
-                    W.Cast(shadowPos, true);
+                    Console.WriteLine("cast WWW");
+                    W.Cast(shadowPos);
+                    serverTookWCast = false;
+                    wIsCasted = true;
+                    recast = Environment.TickCount + 300;
                 }
                 if (E.IsReady() && shadowW != null || shadowR != null) {
                     E.Cast();
@@ -223,7 +232,7 @@ namespace ZedSharp {
                     float delay = midDist/(Q.Speed*3);
                     PredictionOutput po = Prediction.GetPrediction(target, delay*1.1f);
                     if (po.Hitchance > HitChance.Low) {
-                        Console.WriteLine("Cast QQQQ");
+                       // Console.WriteLine("Cast QQQQ");
                         Q.Cast(po.UnitPosition);
                     }
                 }
@@ -295,12 +304,10 @@ namespace ZedSharp {
                     if (Q.IsReady()) {
                         if (target.Distance(shadowW) <= Q.Range) {
                             Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
-                            var QPrediction = Q.GetPrediction(target);
-                            if(QPrediction.Hitchance>HitChance.Low)Q.Cast(QPrediction.CastPosition,true);
+                            Q.Cast(target, true, true);
                         } else if (target.Distance(Player) <= Q.Range) {
                             Q.UpdateSourcePosition(Player.Position, Player.Position);
-                            var QPrediction = Q.GetPrediction(target);
-                            if (QPrediction.Hitchance > HitChance.Low) Q.Cast(QPrediction.CastPosition, true);
+                            Q.Cast(target, true, true);
                         }
                     }
                 }
