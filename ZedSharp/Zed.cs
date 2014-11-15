@@ -154,7 +154,7 @@ namespace ZedSharp {
 
         public static void shadowCoax(Obj_AI_Hero target) {
             Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-            // Game.PrintChat("Wut");
+           // Game.PrintChat("Wut");
             if (shadowW == null || !canGoToShadow("W") || !isKillableShadowCoax(target)) return;
             //var target =
             //    ObjectManager.Get<Obj_AI_Hero>().First(h => h.IsEnemy && h.IsValidTarget() && h.Distance(shadowW) <= R.Range && isKillableShadowCoax(h));
@@ -177,14 +177,14 @@ namespace ZedSharp {
             if (LXOrbwalker.CanAttack()) Player.IssueOrder(GameObjectOrder.AttackUnit, target);
             sumItems.castIgnite(target);
             castItemsFull(target);
-            // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
-            //     R.Cast();
-            //  }
+           // if (canGoToShadow("R") && shadowR != null && !Player.IsAutoAttacking) {
+           //     R.Cast();
+          //  }
         }
 
         /*public static void doShadowCoax(Obj_AI_Hero target) {
             if (E.IsReady() && Q.IsReady() && shadowW != null && LXOrbwalker.CanAttack() && canGoToShadow("W") &&
-                isKillableShadowCoax(target) && target.Distance(shadowW.Position) <= R.Range) {
+                    isKillableShadowCoax(target) && target.Distance(shadowW.Position) <= R.Range) {
                 shadowCoax(target);
             }
         }*/
@@ -268,9 +268,11 @@ namespace ZedSharp {
             if (ListOfEnemies.Count > 0 && E.IsReady()) E.Cast(true);
         }
 
-        private static bool canDoCombo(IEnumerable<SpellSlot> sp) {
+        private static bool canDoCombo(IEnumerable<SpellSlot> sp)
+        {
+            float delay = sp.Sum(sp1 => Player.Spellbook.GetSpell(sp1).SData.SpellCastTime);//Hope it is correct
             float totalCost = sp.Sum(sp1 => Player.Spellbook.GetManaCost(sp1));
-            return Player.Mana >= totalCost;
+            return Player.Mana + delay * 5 >= totalCost;
         }
 
         public static void doHarass() {
@@ -294,10 +296,10 @@ namespace ZedSharp {
                         if (target.Distance(shadowW) <= Q.Range) {
                             Q.UpdateSourcePosition(shadowW.ServerPosition, shadowW.ServerPosition);
                             Q.Cast(target, true, true);
-                        }
-                        else if (target.Distance(Player) <= Q.Range) {
+                        } else if (target.Distance(Player) <= Q.Range) {
                             Q.UpdateSourcePosition(Player.Position, Player.Position);
-                            Q.Cast(target, true, true);
+                            var QPrediction = Q.GetPrediction(target);
+                            if (QPrediction.Hitchance > HitChance.Low) Q.Cast(QPrediction.CastPosition, true);
                         }
                     }
                 }

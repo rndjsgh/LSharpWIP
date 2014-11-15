@@ -48,6 +48,7 @@ namespace ZedSharp {
             foreach (Obj_AI_Hero Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy)) {
                 menu.SubMenu("ultOn").AddItem(new MenuItem("use" + Enemy.ChampionName, Enemy.ChampionName).SetValue(true));
             }
+
         }
 
         private static void loadMenu() {
@@ -213,7 +214,7 @@ namespace ZedSharp {
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range &&
-                        menu.Item("use" + target.ChampionName).GetValue<bool>())
+                        menu.Item("useRC").GetValue<bool>() && menu.Item("use" + target.ChampionName).GetValue<bool>())
                         Zed.doLaneCombo(target);
                     else
                         Zed.normalCombo();
