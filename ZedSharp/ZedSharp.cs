@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Speech.Recognition;
+using System.Speech.Synthesis;
+using System.Threading;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -27,6 +30,15 @@ namespace ZedSharp {
 
         public static Menu menu;
 
+        private static SpeechSynthesizer sSynth = new SpeechSynthesizer();
+        private static readonly SpeechRecognitionEngine sRecognize = new SpeechRecognitionEngine();
+        public static Choices speechList = new Choices();
+        public static Grammar gr;
+        public static Timer speechTimer;
+        private static bool wantSpeech;
+        private static int oldInterval;
+        static Spell recallSlot = new Spell(SpellSlot.Recall);
+
         public static HpBarIndicator hpi = new HpBarIndicator();
         public static bool W2;
         public static bool R2;
@@ -48,7 +60,6 @@ namespace ZedSharp {
             foreach (Obj_AI_Hero Enemy in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy)) {
                 menu.SubMenu("ultOn").AddItem(new MenuItem("use" + Enemy.ChampionName, Enemy.ChampionName).SetValue(true));
             }
-
         }
 
         private static void loadMenu() {
@@ -93,6 +104,10 @@ namespace ZedSharp {
             menu.AddSubMenu(new Menu("Draw Options", "draw"));
             menu.SubMenu("draw").AddItem(new MenuItem("drawHp", "Draw predicted hp").SetValue(true));
 
+            menu.AddSubMenu(new Menu("Speech Options", "spoken"));
+            menu.SubMenu("spoken").AddItem(new MenuItem("speech", "Enabled").SetValue(true));
+            menu.SubMenu("spoken").AddItem(new MenuItem("speechinterval", "delay").SetValue(new Slider(1000, 250, 5000))); 
+
             menu.AddSubMenu(new Menu("Misc Options", "misc"));
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHPToggle", "Swap R at % HP").SetValue(true)); //dont need %
             menu.SubMenu("misc").AddItem(new MenuItem("SwapHP", "%HP").SetValue(new Slider(5, 1))); //nop
@@ -124,9 +139,47 @@ namespace ZedSharp {
                 Game.OnGameProcessPacket += OnGameProcessPacket;
 
                 Zed.setSkillshots();
+
+                loadSpeech();
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void loadSpeech() {
+            speechList.Add(new[] {"theline", "linecombo", "goham", "recall"});
+            gr = new Grammar(new GrammarBuilder(speechList));
+            speechTimer = new Timer(TimerCallBack, null, 0, menu.Item("speechinterval").GetValue<Slider>().Value);
+        }
+
+        private static void TimerCallBack(object state) {
+            if (wantSpeech) {
+                try {
+                    sRecognize.RequestRecognizerUpdate();
+                    sRecognize.LoadGrammar(gr);
+                    sRecognize.SpeechRecognized += sRecognize_SpeechRecognized;
+                    sRecognize.SetInputToDefaultAudioDevice();
+                    sRecognize.RecognizeAsync(RecognizeMode.Multiple);
+                    sRecognize.Recognize();
+                }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        private static void sRecognize_SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
+            var target = SimpleTs.GetTarget(Zed.R.Range, SimpleTs.DamageType.Physical);
+            switch (e.Result.Text) {
+                case "theline":
+                case "linecombo":
+                case "goham":
+                    Zed.doLaneCombo(target);
+                    break;
+                case "recall":
+                    recallSlot.Cast();
+                    break;
             }
         }
 
@@ -210,6 +263,7 @@ namespace ZedSharp {
             if (menu.Item("shadowCoax").GetValue<KeyBind>().Active) {
                 Zed.shadowCoax(target2);
             }
+            setInterval();
             switch (LXOrbwalker.CurrentMode) {
                 case LXOrbwalker.Mode.Combo:
                     if (Zed.R.IsReady() && Zed.Player.Distance(target) < Zed.R.Range &&
@@ -227,6 +281,21 @@ namespace ZedSharp {
                 case LXOrbwalker.Mode.Lasthit:
                     Zed.doLastHit();
                     break;
+            }
+        }
+
+        private static void setInterval() {
+            wantSpeech = menu.Item("speech").GetValue<bool>();
+            if (wantSpeech) {
+                int speechInterval = menu.Item("speechinterval").GetValue<Slider>().Value;
+                if (oldInterval == speechInterval) {
+                    return;
+                }
+                if (oldInterval != speechInterval) {
+                    speechTimer.Change(0, speechInterval);
+                    //Message("New Delay: " + speechInterval / 1000 + " Seconds.");
+                    oldInterval = speechInterval;
+                }
             }
         }
 

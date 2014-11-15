@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Speech.Recognition;
+using System.Timers;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -276,17 +278,21 @@ namespace ZedSharp {
             if (ZedSharp.menu.Item("harassEnabled").GetValue<bool>()) {
                 switch (ZedSharp.menu.Item("harassMode").GetValue<StringList>().SelectedIndex) {
                     case 0: //WEQ
-                        if (target.IsValidTarget(W.Range + Q.Range) && target.Distance(Player) < W.Range + Q.Range) {
+                        if (target.IsValidTarget(W.Range + Q.Range)) {
                             if (W.IsReady() && shadowW == null && !getWshad) {
                                 // Throw W
                                 W.Cast(target.Position, true);
                                 LastWCast = Environment.TickCount;
                             }
+                        }
+                        if (target.IsValidTarget(E.Range)) {
                             if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
                                 Player.Distance(shadowW) <= E.Range) {
                                 // Cast E..
                                 E.Cast(true);
                             }
+                        }
+                        if (target.IsValidTarget(Q.Range)) {
                             if (shadowW != null) {
                                 // if shadow is not null update source position.
                                 if (Q.IsReady()) {
