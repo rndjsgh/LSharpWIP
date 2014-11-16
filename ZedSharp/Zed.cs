@@ -103,12 +103,12 @@ namespace ZedSharp {
         public static void normalCombo(Obj_AI_Hero target) {
             if (target.IsValidTarget(W.Range + Q.Range)) {
                 if (W.IsReady() && shadowW == null &&
-                    ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
+                    ((!getWshad && recast <= Environment.TickCount && !serverTookWCast))) {
                     // Throw W
                     W.Cast(target.Position, true);
                     serverTookWCast = false;
                     wIsCasted = true;
-                    recast = Environment.TickCount + 300;
+                    recast = Environment.TickCount + 320;
                 }
             }
             if (E.IsReady() && target.Distance(shadowW) <= E.Range ||
@@ -131,15 +131,13 @@ namespace ZedSharp {
                                 Q.Cast(QPrediction.UnitPosition);
                         }
                     }
+                    return;
                 }
-                if (shadowW == null) {
                     if (Q.IsReady()) {
-                        if (Q.GetPrediction(target, true).Hitchance >= customHitchance) {
-                            Q.UpdateSourcePosition(Player.Position, Player.Position);
+                        if (Q.GetPrediction(target).Hitchance >= customHitchance) {
                             Q.Cast(target);
                         }
                     }
-                }
             }
         }
 
@@ -284,12 +282,12 @@ namespace ZedSharp {
                     case 0: //WEQ
                         if (target.IsValidTarget(W.Range + Q.Range)) {
                             if (W.IsReady() && shadowW == null &&
-                                ((!getWshad && recast < Environment.TickCount && !serverTookWCast))) {
+                                ((!getWshad && recast <= Environment.TickCount && !serverTookWCast))) {
                                 // Throw W
                                 W.Cast(target.Position, true);
                                 serverTookWCast = false;
                                 wIsCasted = true;
-                                recast = Environment.TickCount + 300;
+                                recast = Environment.TickCount + 320;
                             }
                         }
                             if (E.IsReady() && target.Distance(shadowW) <= E.Range ||

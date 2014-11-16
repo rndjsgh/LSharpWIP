@@ -334,7 +334,7 @@ namespace ZedSharp {
             foreach (
                 Obj_AI_Hero Hero in
                     ObjectManager.Get<Obj_AI_Hero>().Where(
-                        h => h.IsEnemy && h.Distance(Zed.shadowW.Position) <= Zed.R.Range)) {
+                        h => h.IsEnemy && h.Distance(Zed.shadowW.Position) <= Zed.R.Range && h.IsValidTarget())) {
                 if (Zed.isKillableShadowCoax(Hero) && Zed.R.IsReady()) {
                     Vector2 pScreen = Drawing.WorldToScreen(Hero.Position);
                     pScreen[0] -= 20;
