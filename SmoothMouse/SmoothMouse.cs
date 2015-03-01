@@ -40,12 +40,16 @@ namespace SmoothMouse
         struct MouseAction
         {
             public bool click;
+            public bool back;
             public Vector3 pos;
+            public List<Vector2> jumps;
 
-            public MouseAction(Vector3 p, bool c)
+            public MouseAction(Vector3 p, bool c,bool b)
             {
                 click = c;
                 pos = p;
+                back = b;
+                jumps = new List<Vector2>();
             }
         }
 
@@ -97,12 +101,18 @@ namespace SmoothMouse
             }
         }
 
-        public static void addMouseEvent(Vector3 pos, bool click = false)
+        public static void addMouseEvent(Vector3 pos, bool click = false, bool back = true)
         {
-            if (lastAdd + 250 < Environment.TickCount)
+            if (lastAdd + 200 < Environment.TickCount)
             {
+                Console.WriteLine("new ouse action");
                 lastAdd = Environment.TickCount;
-                queuePos.Enqueue(new MouseAction(pos, click));
+                //if (queuePos.First().back)
+                 //   queuePos.Dequeue();
+
+                queuePos.Enqueue(new MouseAction(pos, click, false));
+                if (back)
+                    queuePos.Enqueue(new MouseAction(Game.CursorPos, click, back));
             }
         }
 
@@ -111,12 +121,13 @@ namespace SmoothMouse
         {
             new Thread(() =>
             {
-                while (doMouse)
+                while (YasuoSharp.Config.Item("streamMouse").GetValue<bool>())
                 {
                     if (queuePos.Count > 0)
                     {
                         var posNow = getMousePos();
                         var first = queuePos.First();
+                        bool back = first.back;
                         if (!first.pos.IsOnScreen())
                         {
                             queuePos.Dequeue();
@@ -124,20 +135,30 @@ namespace SmoothMouse
                         else
                         {
                             var firstOnScreen = first.pos.toScreen();
-                            if (firstOnScreen.Distance(posNow, true) <= 55 * 55)
+                            if (firstOnScreen.Distance(posNow, true) <= ((!back)?35:35 * 300*300))
                             {
+                                MoveMouse(firstOnScreen);
                                 if (first.click)
                                     doMouseClick();
                                 queuePos.Dequeue();
                             }
                             else
                             {
-                                var moveTo = posNow.Extend(firstOnScreen, 55);
-                                MoveMouse(moveTo);
+
+                                var moveTo = posNow.Extend(firstOnScreen, 25);
+                                if (first.jumps.Count > 1 && first.jumps[first.jumps.Count - 2].Distance(moveTo,true) < 15*15)
+                                {
+                                    queuePos.Dequeue();
+                                }
+                                else
+                                {
+                                    first.jumps.Add(moveTo);
+                                    MoveMouse(moveTo);
+                                }
                             }
                         }
                     }
-                    Thread.Sleep(1000 / 60);
+                    Thread.Sleep(1000 / 50);
                 }
             }).Start();
         }
