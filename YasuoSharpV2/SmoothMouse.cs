@@ -135,8 +135,8 @@ namespace YasuoSharpV2
                         else
                         {
                             var firstOnScreen = first.pos.toScreen();
-                            if (firstOnScreen.Distance(posNow, true) <= ((!back)?35:35 * 300*300))
-                            {
+                            if (firstOnScreen.Distance(posNow, true) <= ((!back)?35*35 : 300*300))
+							{
                                 MoveMouse(firstOnScreen);
                                 if (first.click)
                                     doMouseClick();
