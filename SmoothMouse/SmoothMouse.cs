@@ -135,7 +135,7 @@ namespace SmoothMouse
                         else
                         {
                             var firstOnScreen = first.pos.toScreen();
-                            if (firstOnScreen.Distance(posNow, true) <= ((!back)?35:35 * 300*300))
+                            if (firstOnScreen.Distance(posNow, true) <= (back?300*300:35*35))
                             {
                                 MoveMouse(firstOnScreen);
                                 if (first.click)
