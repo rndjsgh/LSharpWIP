@@ -130,14 +130,14 @@ namespace YasuoSharpV2
 
                     Config.AddToMainMenu();
                     Drawing.OnDraw += onDraw;
-                    Game.OnGameUpdate += OnGameUpdate;
+                    Game.onupdate+= OnGameUpdate;
 
                     GameObject.OnCreate += OnCreateObject;
                     GameObject.OnDelete += OnDeleteObject;
                     Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
                     CustomEvents.Unit.OnLevelUp += OnLevelUp;
 
-                    Game.OnGameSendPacket += OnGameSendPacket;
+                    game.onsendpacket  += OnGameSendPacket;
                     Game.OnGameProcessPacket += OnGameProcessPacket;
 
                     SkillshotDetector.OnDetectSkillshot += OnDetectSkillshot;
